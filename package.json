@@ -1,12 +1,309 @@
-{
-  "name": "award-travel-finder",
-  "private": true,
-  "scripts": {
-    "build": "next build"
+import { useMemo, useState } from "react";
+
+const allResults = [
+  {
+    tag: "Best Overall",
+    program: "Iberia Avios",
+    origin: "BOG",
+    destination: "MAD",
+    route: "BOG → MAD",
+    cabin: "Business",
+    passengers: 1,
+    miles: 42500,
+    taxes: 120,
+    cpp: 4.9,
+    notes: "Excellent nonstop sweet spot"
   },
-  "dependencies": {
-    "next": "14.0.0",
-    "react": "18.2.0",
-    "react-dom": "18.2.0"
+  {
+    tag: "Best Value",
+    program: "Flying Blue",
+    origin: "BOG",
+    destination: "CDG",
+    route: "BOG → CDG",
+    cabin: "Business",
+    passengers: 1,
+    miles: 55000,
+    taxes: 210,
+    cpp: 4.2,
+    notes: "Good availability and transfer options"
+  },
+  {
+    tag: "Lowest Fees",
+    program: "LifeMiles",
+    origin: "MDE",
+    destination: "MAD",
+    route: "MDE → MAD",
+    cabin: "Business",
+    passengers: 1,
+    miles: 63000,
+    taxes: 78,
+    cpp: 3.8,
+    notes: "Lower fees, one-stop option"
+  },
+  {
+    tag: "Popular",
+    program: "Flying Blue",
+    origin: "MDE",
+    destination: "AMS",
+    route: "MDE → AMS",
+    cabin: "Business",
+    passengers: 1,
+    miles: 59000,
+    taxes: 195,
+    cpp: 4.1,
+    notes: "Strong Europe option from Medellín"
+  },
+  {
+    tag: "Popular",
+    program: "Iberia Avios",
+    origin: "MDE",
+    destination: "MAD",
+    route: "MDE → MAD",
+    cabin: "Economy",
+    passengers: 1,
+    miles: 25500,
+    taxes: 95,
+    cpp: 2.7,
+    notes: "Economy fallback option"
   }
+];
+
+export default function Home() {
+  const [origin, setOrigin] = useState("");
+  const [destination, setDestination] = useState("");
+  const [cabin, setCabin] = useState("Business");
+  const [passengers, setPassengers] = useState("1");
+  const [hasSearched, setHasSearched] = useState(false);
+
+  const filteredResults = useMemo(() => {
+    return allResults.filter((result) => {
+      const matchesOrigin =
+        origin.trim() === "" ||
+        result.origin.toLowerCase().includes(origin.trim().toLowerCase());
+
+      const matchesDestination =
+        destination.trim() === "" ||
+        result.destination.toLowerCase().includes(destination.trim().toLowerCase());
+
+      const matchesCabin = result.cabin === cabin;
+      const matchesPassengers = result.passengers === Number(passengers);
+
+      return (
+        matchesOrigin &&
+        matchesDestination &&
+        matchesCabin &&
+        matchesPassengers
+      );
+    });
+  }, [origin, destination, cabin, passengers]);
+
+  return (
+    <div
+      style={{
+        fontFamily: "Arial, sans-serif",
+        background: "#f7f7f7",
+        minHeight: "100vh",
+        padding: "40px 20px"
+      }}
+    >
+      <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+        <div style={{ marginBottom: "32px" }}>
+          <h1 style={{ fontSize: "48px", marginBottom: "12px" }}>
+            Award Travel Finder ✈️
+          </h1>
+          <p style={{ fontSize: "20px", color: "#555", margin: 0 }}>
+            Find the best way to fly using points
+          </p>
+        </div>
+
+        <div
+          style={{
+            background: "white",
+            borderRadius: "16px",
+            padding: "24px",
+            boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+            marginBottom: "32px"
+          }}
+        >
+          <h2 style={{ marginTop: 0 }}>Search awards</h2>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+              gap: "12px",
+              marginBottom: "16px"
+            }}
+          >
+            <input
+              placeholder="Origin (e.g. MDE)"
+              value={origin}
+              onChange={(e) => setOrigin(e.target.value.toUpperCase())}
+              style={inputStyle}
+            />
+
+            <input
+              placeholder="Destination (e.g. MAD)"
+              value={destination}
+              onChange={(e) => setDestination(e.target.value.toUpperCase())}
+              style={inputStyle}
+            />
+
+            <select value={cabin} onChange={(e) => setCabin(e.target.value)} style={inputStyle}>
+              <option>Business</option>
+              <option>Economy</option>
+              <option>First</option>
+            </select>
+
+            <select
+              value={passengers}
+              onChange={(e) => setPassengers(e.target.value)}
+              style={inputStyle}
+            >
+              <option value="1">1 Passenger</option>
+              <option value="2">2 Passengers</option>
+            </select>
+          </div>
+
+          <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+            <button style={buttonStyle} onClick={() => setHasSearched(true)}>
+              Find Awards
+            </button>
+
+            <button
+              style={secondaryButtonStyle}
+              onClick={() => {
+                setOrigin("");
+                setDestination("");
+                setCabin("Business");
+                setPassengers("1");
+                setHasSearched(false);
+              }}
+            >
+              Reset
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <h2 style={{ marginBottom: "8px" }}>
+            {hasSearched ? "Search results" : "Sample results"}
+          </h2>
+
+          <p style={{ color: "#666", marginTop: 0, marginBottom: "18px" }}>
+            {hasSearched
+              ? `${filteredResults.length} result${filteredResults.length === 1 ? "" : "s"} found`
+              : "Enter a route and click Find Awards"}
+          </p>
+
+          {hasSearched && filteredResults.length === 0 ? (
+            <div
+              style={{
+                background: "white",
+                borderRadius: "16px",
+                padding: "24px",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.08)"
+              }}
+            >
+              <h3 style={{ marginTop: 0 }}>No results found</h3>
+              <p style={{ color: "#555", marginBottom: 0 }}>
+                Try MDE → MAD, BOG → MAD, BOG → CDG, or MDE → AMS.
+              </p>
+            </div>
+          ) : (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+                gap: "18px"
+              }}
+            >
+              {(hasSearched ? filteredResults : allResults).map((r, i) => (
+                <div
+                  key={`${r.program}-${r.route}-${i}`}
+                  style={{
+                    background: "white",
+                    borderRadius: "16px",
+                    padding: "22px",
+                    boxShadow: "0 8px 24px rgba(0,0,0,0.08)"
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "inline-block",
+                      background: "#111",
+                      color: "white",
+                      borderRadius: "999px",
+                      padding: "6px 12px",
+                      fontSize: "12px",
+                      marginBottom: "14px"
+                    }}
+                  >
+                    {r.tag}
+                  </div>
+
+                  <h3 style={{ margin: "0 0 8px 0", fontSize: "24px" }}>
+                    {r.program}
+                  </h3>
+
+                  <p style={{ color: "#666", marginTop: 0 }}>{r.route}</p>
+
+                  <div style={{ margin: "16px 0" }}>
+                    <p style={statStyle}>
+                      <strong>{r.miles.toLocaleString()}</strong> miles
+                    </p>
+                    <p style={statStyle}>
+                      <strong>${r.taxes}</strong> taxes
+                    </p>
+                    <p style={statStyle}>
+                      <strong>{r.cpp} cpp</strong>
+                    </p>
+                    <p style={statStyle}>
+                      <strong>{r.cabin}</strong>
+                    </p>
+                  </div>
+
+                  <p style={{ color: "#444", marginBottom: 0 }}>{r.notes}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
+
+const inputStyle = {
+  padding: "14px 16px",
+  borderRadius: "10px",
+  border: "1px solid #ddd",
+  fontSize: "16px",
+  width: "100%",
+  boxSizing: "border-box"
+};
+
+const buttonStyle = {
+  background: "#111",
+  color: "white",
+  border: "none",
+  borderRadius: "10px",
+  padding: "14px 20px",
+  fontSize: "16px",
+  cursor: "pointer"
+};
+
+const secondaryButtonStyle = {
+  background: "white",
+  color: "#111",
+  border: "1px solid #ddd",
+  borderRadius: "10px",
+  padding: "14px 20px",
+  fontSize: "16px",
+  cursor: "pointer"
+};
+
+const statStyle = {
+  margin: "6px 0",
+  fontSize: "16px"
+};
