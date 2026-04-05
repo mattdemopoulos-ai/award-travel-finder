@@ -1,69 +1,54 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 const allResults = [
   {
-    tag: "Best Overall",
     program: "Iberia Avios",
     origin: "BOG",
     destination: "MAD",
-    route: "BOG → MAD",
+    route: "BOG to MAD",
     cabin: "Business",
-    passengers: 1,
     miles: 42500,
     taxes: 120,
-    cpp: 4.9,
     notes: "Excellent nonstop sweet spot"
   },
   {
-    tag: "Best Value",
     program: "Flying Blue",
     origin: "BOG",
     destination: "CDG",
-    route: "BOG → CDG",
+    route: "BOG to CDG",
     cabin: "Business",
-    passengers: 1,
     miles: 55000,
     taxes: 210,
-    cpp: 4.2,
     notes: "Good availability and transfer options"
   },
   {
-    tag: "Lowest Fees",
     program: "LifeMiles",
     origin: "MDE",
     destination: "MAD",
-    route: "MDE → MAD",
+    route: "MDE to MAD",
     cabin: "Business",
-    passengers: 1,
     miles: 63000,
     taxes: 78,
-    cpp: 3.8,
     notes: "Lower fees, one-stop option"
   },
   {
-    tag: "Popular",
     program: "Flying Blue",
     origin: "MDE",
     destination: "AMS",
-    route: "MDE → AMS",
+    route: "MDE to AMS",
     cabin: "Business",
-    passengers: 1,
     miles: 59000,
     taxes: 195,
-    cpp: 4.1,
-    notes: "Strong Europe option from Medellín"
+    notes: "Strong Europe option from Medellin"
   },
   {
-    tag: "Popular",
     program: "Iberia Avios",
     origin: "MDE",
     destination: "MAD",
-    route: "MDE → MAD",
+    route: "MDE to MAD",
     cabin: "Economy",
-    passengers: 1,
     miles: 25500,
     taxes: 95,
-    cpp: 2.7,
     notes: "Economy fallback option"
   }
 ];
@@ -75,12 +60,14 @@ export default function Home() {
   const [results, setResults] = useState(allResults);
 
   function handleSearch() {
-    const filtered = allResults.filter((result) => {
+    const filtered = allResults.filter(function (result) {
       const matchesOrigin =
-        origin === "" || result.origin === origin.toUpperCase();
+        origin.trim() === "" ||
+        result.origin === origin.trim().toUpperCase();
 
       const matchesDestination =
-        destination === "" || result.destination === destination.toUpperCase();
+        destination.trim() === "" ||
+        result.destination === destination.trim().toUpperCase();
 
       const matchesCabin = result.cabin === cabin;
 
@@ -98,171 +85,126 @@ export default function Home() {
   }
 
   return (
-    <div style={pageStyle}>
-      <div style={containerStyle}>
-        <h1 style={titleStyle}>Award Travel Finder ✈️</h1>
-        <p style={subtitleStyle}>
-          Find the best way to fly using points
-        </p>
+    <div style={{ fontFamily: "Arial, sans-serif", padding: "40px", backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
+      <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
+        <h1>Award Travel Finder ✈️</h1>
+        <p>Find the best way to fly using points.</p>
 
-        <div style={searchBoxStyle}>
-          <h2 style={{ marginTop: 0 }}>Search awards</h2>
+        <div
+          style={{
+            backgroundColor: "white",
+            padding: "20px",
+            borderRadius: "12px",
+            marginBottom: "30px",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.08)"
+          }}
+        >
+          <h2>Search</h2>
 
-          <div style={gridStyle}>
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "15px" }}>
             <input
-              style={inputStyle}
+              type="text"
               placeholder="Origin (e.g. MDE)"
               value={origin}
-              onChange={(e) => setOrigin(e.target.value.toUpperCase())}
+              onChange={function (e) {
+                setOrigin(e.target.value);
+              }}
+              style={{ padding: "10px", minWidth: "180px" }}
             />
 
             <input
-              style={inputStyle}
+              type="text"
               placeholder="Destination (e.g. MAD)"
               value={destination}
-              onChange={(e) => setDestination(e.target.value.toUpperCase())}
+              onChange={function (e) {
+                setDestination(e.target.value);
+              }}
+              style={{ padding: "10px", minWidth: "180px" }}
             />
 
             <select
-              style={inputStyle}
               value={cabin}
-              onChange={(e) => setCabin(e.target.value)}
+              onChange={function (e) {
+                setCabin(e.target.value);
+              }}
+              style={{ padding: "10px", minWidth: "180px" }}
             >
-              <option>Business</option>
-              <option>Economy</option>
-              <option>First</option>
+              <option value="Business">Business</option>
+              <option value="Economy">Economy</option>
+              <option value="First">First</option>
             </select>
           </div>
 
-          <div style={{ marginTop: "16px", display: "flex", gap: "12px" }}>
-            <button style={buttonStyle} onClick={handleSearch}>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <button
+              onClick={handleSearch}
+              style={{
+                padding: "10px 16px",
+                backgroundColor: "black",
+                color: "white",
+                border: "none",
+                borderRadius: "8px",
+                cursor: "pointer"
+              }}
+            >
               Find Awards
             </button>
 
-            <button style={secondaryButtonStyle} onClick={handleReset}>
+            <button
+              onClick={handleReset}
+              style={{
+                padding: "10px 16px",
+                backgroundColor: "white",
+                color: "black",
+                border: "1px solid #ccc",
+                borderRadius: "8px",
+                cursor: "pointer"
+              }}
+            >
               Reset
             </button>
           </div>
         </div>
 
         <h2>Results</h2>
-        <p style={{ color: "#666" }}>
-          {results.length} result{results.length === 1 ? "" : "s"}
-        </p>
 
         {results.length === 0 ? (
-          <div style={cardStyle}>
-            <h3 style={{ marginTop: 0 }}>No results found</h3>
-            <p style={{ marginBottom: 0 }}>
-              Try MDE → MAD, BOG → MAD, BOG → CDG, or MDE → AMS.
-            </p>
+          <div
+            style={{
+              backgroundColor: "white",
+              padding: "20px",
+              borderRadius: "12px",
+              boxShadow: "0 2px 10px rgba(0,0,0,0.08)"
+            }}
+          >
+            <p>No results found.</p>
+            <p>Try MDE to MAD, BOG to MAD, or BOG to CDG.</p>
           </div>
         ) : (
-          <div style={resultsGridStyle}>
-            {results.map((r, i) => (
-              <div key={i} style={cardStyle}>
-                <div style={tagStyle}>{r.tag}</div>
-                <h3 style={{ marginBottom: "8px" }}>{r.program}</h3>
-                <p style={{ color: "#666" }}>{r.route}</p>
-                <p><strong>{r.miles.toLocaleString()}</strong> miles</p>
-                <p><strong>${r.taxes}</strong> taxes</p>
-                <p><strong>{r.cpp}</strong> cpp</p>
-                <p><strong>{r.cabin}</strong></p>
-                <p style={{ marginBottom: 0 }}>{r.notes}</p>
-              </div>
-            ))}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "16px" }}>
+            {results.map(function (result, index) {
+              return (
+                <div
+                  key={index}
+                  style={{
+                    backgroundColor: "white",
+                    padding: "20px",
+                    borderRadius: "12px",
+                    boxShadow: "0 2px 10px rgba(0,0,0,0.08)"
+                  }}
+                >
+                  <h3>{result.program}</h3>
+                  <p>{result.route}</p>
+                  <p><strong>{result.cabin}</strong></p>
+                  <p><strong>{result.miles.toLocaleString()}</strong> miles</p>
+                  <p><strong>${result.taxes}</strong> taxes</p>
+                  <p>{result.notes}</p>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
     </div>
   );
 }
-
-const pageStyle = {
-  fontFamily: "Arial, sans-serif",
-  background: "#f7f7f7",
-  minHeight: "100vh",
-  padding: "40px 20px"
-};
-
-const containerStyle = {
-  maxWidth: "1100px",
-  margin: "0 auto"
-};
-
-const titleStyle = {
-  fontSize: "48px",
-  marginBottom: "12px"
-};
-
-const subtitleStyle = {
-  fontSize: "20px",
-  color: "#555",
-  marginTop: 0
-};
-
-const searchBoxStyle = {
-  background: "white",
-  borderRadius: "16px",
-  padding: "24px",
-  boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
-  marginBottom: "32px"
-};
-
-const gridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-  gap: "12px"
-};
-
-const resultsGridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-  gap: "18px"
-};
-
-const inputStyle = {
-  padding: "14px 16px",
-  borderRadius: "10px",
-  border: "1px solid #ddd",
-  fontSize: "16px",
-  width: "100%",
-  boxSizing: "border-box"
-};
-
-const buttonStyle = {
-  background: "#111",
-  color: "white",
-  border: "none",
-  borderRadius: "10px",
-  padding: "14px 20px",
-  fontSize: "16px",
-  cursor: "pointer"
-};
-
-const secondaryButtonStyle = {
-  background: "white",
-  color: "#111",
-  border: "1px solid #ddd",
-  borderRadius: "10px",
-  padding: "14px 20px",
-  fontSize: "16px",
-  cursor: "pointer"
-};
-
-const cardStyle = {
-  background: "white",
-  borderRadius: "16px",
-  padding: "22px",
-  boxShadow: "0 8px 24px rgba(0,0,0,0.08)"
-};
-
-const tagStyle = {
-  display: "inline-block",
-  background: "#111",
-  color: "white",
-  borderRadius: "999px",
-  padding: "6px 12px",
-  fontSize: "12px",
-  marginBottom: "14px"
-};
