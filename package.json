@@ -1,30 +1,8 @@
-import { useState } from "react";
-
 export default function Home() {
-  const [message, setMessage] = useState("Button has not been clicked yet.");
-
-  function handleClick() {
-    setMessage("Find Awards button works.");
-  }
-
   return (
-    <div style={{ padding: "40px", fontFamily: "Arial, sans-serif" }}>
-      <h1>Award Travel Finder ✈️</h1>
-      <p>{message}</p>
-
-      <button
-        onClick={handleClick}
-        style={{
-          padding: "12px 18px",
-          backgroundColor: "black",
-          color: "white",
-          border: "none",
-          borderRadius: "8px",
-          cursor: "pointer"
-        }}
-      >
-        Find Awards
-      </button>
+    <div style={{ padding: 40, fontFamily: "Arial, sans-serif" }}>
+      <h1>TEST VERSION 12345</h1>
+      <p>If you can see this exact text, the deployment updated.</p>
     </div>
   );
 }
