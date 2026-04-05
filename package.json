@@ -1,8 +1,14 @@
-export default function Home() {
-  return (
-    <div style={{ padding: 40, fontFamily: "Arial, sans-serif" }}>
-      <h1>TEST VERSION 12345</h1>
-      <p>If you can see this exact text, the deployment updated.</p>
-    </div>
-  );
+{
+  "name": "award-travel-finder",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "14.0.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  }
 }
