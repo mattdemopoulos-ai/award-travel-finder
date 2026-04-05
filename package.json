@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import React, { useState } from "react";
 
 const allResults = [
   {
@@ -72,207 +72,154 @@ export default function Home() {
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
   const [cabin, setCabin] = useState("Business");
-  const [passengers, setPassengers] = useState("1");
-  const [hasSearched, setHasSearched] = useState(false);
+  const [results, setResults] = useState(allResults);
 
-  const filteredResults = useMemo(() => {
-    return allResults.filter((result) => {
+  function handleSearch() {
+    const filtered = allResults.filter((result) => {
       const matchesOrigin =
-        origin.trim() === "" ||
-        result.origin.toLowerCase().includes(origin.trim().toLowerCase());
+        origin === "" || result.origin === origin.toUpperCase();
 
       const matchesDestination =
-        destination.trim() === "" ||
-        result.destination.toLowerCase().includes(destination.trim().toLowerCase());
+        destination === "" || result.destination === destination.toUpperCase();
 
       const matchesCabin = result.cabin === cabin;
-      const matchesPassengers = result.passengers === Number(passengers);
 
-      return (
-        matchesOrigin &&
-        matchesDestination &&
-        matchesCabin &&
-        matchesPassengers
-      );
+      return matchesOrigin && matchesDestination && matchesCabin;
     });
-  }, [origin, destination, cabin, passengers]);
+
+    setResults(filtered);
+  }
+
+  function handleReset() {
+    setOrigin("");
+    setDestination("");
+    setCabin("Business");
+    setResults(allResults);
+  }
 
   return (
-    <div
-      style={{
-        fontFamily: "Arial, sans-serif",
-        background: "#f7f7f7",
-        minHeight: "100vh",
-        padding: "40px 20px"
-      }}
-    >
-      <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-        <div style={{ marginBottom: "32px" }}>
-          <h1 style={{ fontSize: "48px", marginBottom: "12px" }}>
-            Award Travel Finder ✈️
-          </h1>
-          <p style={{ fontSize: "20px", color: "#555", margin: 0 }}>
-            Find the best way to fly using points
-          </p>
-        </div>
+    <div style={pageStyle}>
+      <div style={containerStyle}>
+        <h1 style={titleStyle}>Award Travel Finder ✈️</h1>
+        <p style={subtitleStyle}>
+          Find the best way to fly using points
+        </p>
 
-        <div
-          style={{
-            background: "white",
-            borderRadius: "16px",
-            padding: "24px",
-            boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
-            marginBottom: "32px"
-          }}
-        >
+        <div style={searchBoxStyle}>
           <h2 style={{ marginTop: 0 }}>Search awards</h2>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-              gap: "12px",
-              marginBottom: "16px"
-            }}
-          >
+          <div style={gridStyle}>
             <input
+              style={inputStyle}
               placeholder="Origin (e.g. MDE)"
               value={origin}
               onChange={(e) => setOrigin(e.target.value.toUpperCase())}
-              style={inputStyle}
             />
 
             <input
+              style={inputStyle}
               placeholder="Destination (e.g. MAD)"
               value={destination}
               onChange={(e) => setDestination(e.target.value.toUpperCase())}
-              style={inputStyle}
             />
 
-            <select value={cabin} onChange={(e) => setCabin(e.target.value)} style={inputStyle}>
+            <select
+              style={inputStyle}
+              value={cabin}
+              onChange={(e) => setCabin(e.target.value)}
+            >
               <option>Business</option>
               <option>Economy</option>
               <option>First</option>
             </select>
-
-            <select
-              value={passengers}
-              onChange={(e) => setPassengers(e.target.value)}
-              style={inputStyle}
-            >
-              <option value="1">1 Passenger</option>
-              <option value="2">2 Passengers</option>
-            </select>
           </div>
 
-          <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-            <button style={buttonStyle} onClick={() => setHasSearched(true)}>
+          <div style={{ marginTop: "16px", display: "flex", gap: "12px" }}>
+            <button style={buttonStyle} onClick={handleSearch}>
               Find Awards
             </button>
 
-            <button
-              style={secondaryButtonStyle}
-              onClick={() => {
-                setOrigin("");
-                setDestination("");
-                setCabin("Business");
-                setPassengers("1");
-                setHasSearched(false);
-              }}
-            >
+            <button style={secondaryButtonStyle} onClick={handleReset}>
               Reset
             </button>
           </div>
         </div>
 
-        <div>
-          <h2 style={{ marginBottom: "8px" }}>
-            {hasSearched ? "Search results" : "Sample results"}
-          </h2>
+        <h2>Results</h2>
+        <p style={{ color: "#666" }}>
+          {results.length} result{results.length === 1 ? "" : "s"}
+        </p>
 
-          <p style={{ color: "#666", marginTop: 0, marginBottom: "18px" }}>
-            {hasSearched
-              ? `${filteredResults.length} result${filteredResults.length === 1 ? "" : "s"} found`
-              : "Enter a route and click Find Awards"}
-          </p>
-
-          {hasSearched && filteredResults.length === 0 ? (
-            <div
-              style={{
-                background: "white",
-                borderRadius: "16px",
-                padding: "24px",
-                boxShadow: "0 8px 24px rgba(0,0,0,0.08)"
-              }}
-            >
-              <h3 style={{ marginTop: 0 }}>No results found</h3>
-              <p style={{ color: "#555", marginBottom: 0 }}>
-                Try MDE → MAD, BOG → MAD, BOG → CDG, or MDE → AMS.
-              </p>
-            </div>
-          ) : (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-                gap: "18px"
-              }}
-            >
-              {(hasSearched ? filteredResults : allResults).map((r, i) => (
-                <div
-                  key={`${r.program}-${r.route}-${i}`}
-                  style={{
-                    background: "white",
-                    borderRadius: "16px",
-                    padding: "22px",
-                    boxShadow: "0 8px 24px rgba(0,0,0,0.08)"
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "inline-block",
-                      background: "#111",
-                      color: "white",
-                      borderRadius: "999px",
-                      padding: "6px 12px",
-                      fontSize: "12px",
-                      marginBottom: "14px"
-                    }}
-                  >
-                    {r.tag}
-                  </div>
-
-                  <h3 style={{ margin: "0 0 8px 0", fontSize: "24px" }}>
-                    {r.program}
-                  </h3>
-
-                  <p style={{ color: "#666", marginTop: 0 }}>{r.route}</p>
-
-                  <div style={{ margin: "16px 0" }}>
-                    <p style={statStyle}>
-                      <strong>{r.miles.toLocaleString()}</strong> miles
-                    </p>
-                    <p style={statStyle}>
-                      <strong>${r.taxes}</strong> taxes
-                    </p>
-                    <p style={statStyle}>
-                      <strong>{r.cpp} cpp</strong>
-                    </p>
-                    <p style={statStyle}>
-                      <strong>{r.cabin}</strong>
-                    </p>
-                  </div>
-
-                  <p style={{ color: "#444", marginBottom: 0 }}>{r.notes}</p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        {results.length === 0 ? (
+          <div style={cardStyle}>
+            <h3 style={{ marginTop: 0 }}>No results found</h3>
+            <p style={{ marginBottom: 0 }}>
+              Try MDE → MAD, BOG → MAD, BOG → CDG, or MDE → AMS.
+            </p>
+          </div>
+        ) : (
+          <div style={resultsGridStyle}>
+            {results.map((r, i) => (
+              <div key={i} style={cardStyle}>
+                <div style={tagStyle}>{r.tag}</div>
+                <h3 style={{ marginBottom: "8px" }}>{r.program}</h3>
+                <p style={{ color: "#666" }}>{r.route}</p>
+                <p><strong>{r.miles.toLocaleString()}</strong> miles</p>
+                <p><strong>${r.taxes}</strong> taxes</p>
+                <p><strong>{r.cpp}</strong> cpp</p>
+                <p><strong>{r.cabin}</strong></p>
+                <p style={{ marginBottom: 0 }}>{r.notes}</p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
 }
+
+const pageStyle = {
+  fontFamily: "Arial, sans-serif",
+  background: "#f7f7f7",
+  minHeight: "100vh",
+  padding: "40px 20px"
+};
+
+const containerStyle = {
+  maxWidth: "1100px",
+  margin: "0 auto"
+};
+
+const titleStyle = {
+  fontSize: "48px",
+  marginBottom: "12px"
+};
+
+const subtitleStyle = {
+  fontSize: "20px",
+  color: "#555",
+  marginTop: 0
+};
+
+const searchBoxStyle = {
+  background: "white",
+  borderRadius: "16px",
+  padding: "24px",
+  boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+  marginBottom: "32px"
+};
+
+const gridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+  gap: "12px"
+};
+
+const resultsGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+  gap: "18px"
+};
 
 const inputStyle = {
   padding: "14px 16px",
@@ -303,7 +250,19 @@ const secondaryButtonStyle = {
   cursor: "pointer"
 };
 
-const statStyle = {
-  margin: "6px 0",
-  fontSize: "16px"
+const cardStyle = {
+  background: "white",
+  borderRadius: "16px",
+  padding: "22px",
+  boxShadow: "0 8px 24px rgba(0,0,0,0.08)"
+};
+
+const tagStyle = {
+  display: "inline-block",
+  background: "#111",
+  color: "white",
+  borderRadius: "999px",
+  padding: "6px 12px",
+  fontSize: "12px",
+  marginBottom: "14px"
 };
