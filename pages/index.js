@@ -1,123 +1,143 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
-function generateDates() {
-  const dates = [];
+function makeDates() {
+  const out = [];
   const start = new Date("2026-06-01");
   const end = new Date("2027-02-28");
-  const current = new Date(start);
+  const d = new Date(start);
 
-  while (current <= end) {
-    const yyyy = current.getFullYear();
-    const mm = String(current.getMonth() + 1).padStart(2, "0");
-    const dd = String(current.getDate()).padStart(2, "0");
-    dates.push(`${yyyy}-${mm}-${dd}`);
-    current.setDate(current.getDate() + 1);
+  while (d <= end) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    out.push(`${y}-${m}-${day}`);
+    d.setDate(d.getDate() + 1);
   }
 
-  return dates;
+  return out;
 }
 
-const dateOptions = generateDates();
+const dates = makeDates();
 
 const origins = [
-  "ALL",
-  "MDE",
-  "BOG",
-  "CTG",
-  "CLO",
-  "MEX",
-  "GDL",
-  "MTY",
-  "LIM",
-  "SCL",
-  "EZE",
-  "GRU",
-  "GIG",
-  "UIO",
-  "PTY",
-  "SJO",
-  "SAL",
-  "SDQ",
-  "PUJ",
-  "AUA",
-  "CUR",
-  "MIA",
-  "JFK",
-  "DFW",
-  "LAX",
-  "IAH",
-  "ORD"
+  "ALL", "MDE", "BOG", "CTG", "CLO", "MEX", "LIM", "SCL", "EZE", "GRU", "GIG",
+  "UIO", "PTY", "SJO", "SDQ", "PUJ", "AUA", "CUR", "MIA", "JFK", "DFW", "LAX", "IAH", "ORD"
 ];
 
 const destinations = [
-  "ALL",
-  "MAD",
-  "BCN",
-  "CDG",
-  "AMS",
-  "LHR",
-  "FRA",
-  "FCO",
-  "LIS",
-  "DUB",
-  "ZRH",
-  "ATH",
-  "IST",
-  "DXB",
-  "DOH",
-  "MIA",
-  "JFK",
-  "DFW",
-  "LAX",
-  "IAH",
-  "ORD"
+  "ALL", "MAD", "BCN", "CDG", "AMS", "LHR", "FRA", "FCO", "LIS", "DUB",
+  "ZRH", "ATH", "IST", "DXB", "DOH", "MIA", "JFK", "DFW", "LAX", "IAH", "ORD"
 ];
 
-const cabins = ["Business", "Economy", "ALL"];
+const allResults = [
+  { program: "Iberia Avios", origin: "BOG", destination: "MAD", date: "2026-06-10", cabin: "Business", miles: 42500, taxes: 120 },
+  { program: "Flying Blue", origin: "BOG", destination: "CDG", date: "2026-06-12", cabin: "Business", miles: 55000, taxes: 210 },
+  { program: "LifeMiles", origin: "MDE", destination: "MAD", date: "2026-06-10", cabin: "Business", miles: 63000, taxes: 78 },
+  { program: "Flying Blue", origin: "MDE", destination: "AMS", date: "2026-06-15", cabin: "Business", miles: 59000, taxes: 195 },
+  { program: "Iberia Avios", origin: "MEX", destination: "MAD", date: "2026-07-01", cabin: "Business", miles: 51000, taxes: 150 },
+  { program: "Flying Blue", origin: "GRU", destination: "CDG", date: "2026-07-08", cabin: "Business", miles: 55000, taxes: 250 },
+  { program: "LifeMiles", origin: "LIM", destination: "MAD", date: "2026-08-05", cabin: "Business", miles: 65000, taxes: 85 },
+  { program: "AAdvantage", origin: "BOG", destination: "MIA", date: "2026-06-20", cabin: "Business", miles: 30000, taxes: 80 },
+  { program: "United", origin: "MDE", destination: "IAH", date: "2026-09-01", cabin: "Business", miles: 35000, taxes: 70 },
+  { program: "Iberia Avios", origin: "CTG", destination: "MAD", date: "2026-10-10", cabin: "Economy", miles: 28000, taxes: 110 }
+];
 
-const routeTemplates = [
-  {
-    program: "Iberia Avios",
-    origin: "BOG",
-    destination: "MAD",
-    cabin: "Business",
-    miles: 42500,
-    taxes: 120,
-    cashPrice: 2200,
-    transferPartners: ["Amex", "Chase", "Capital One"],
-    bookingInstructions: "Transfer points to Iberia Avios and book on Iberia.com.",
-    easeScore: 9
-  },
-  {
-    program: "Flying Blue",
-    origin: "BOG",
-    destination: "CDG",
-    cabin: "Business",
-    miles: 55000,
-    taxes: 210,
-    cashPrice: 2400,
-    transferPartners: ["Amex", "Chase", "Citi", "Capital One"],
-    bookingInstructions: "Transfer points to Flying Blue and book on Air France or KLM.",
-    easeScore: 8
-  },
-  {
-    program: "LifeMiles",
-    origin: "MDE",
-    destination: "MAD",
-    cabin: "Business",
-    miles: 63000,
-    taxes: 78,
-    cashPrice: 2100,
-    transferPartners: ["Amex", "Citi", "Capital One"],
-    bookingInstructions: "Transfer points to LifeMiles and book Star Alliance options on LifeMiles.com.",
-    easeScore: 7
-  },
-  {
-    program: "Flying Blue",
-    origin: "MDE",
-    destination: "AMS",
-    cabin: "Business",
-    miles: 59000,
-    taxes: 195,
-    cashPrice: 2350,
-    transferPartners: ["Amex", "Chase
+export default function Home() {
+  const [origin, setOrigin] = useState("ALL");
+  const [destination, setDestination] = useState("ALL");
+  const [date, setDate] = useState("ALL");
+  const [cabin, setCabin] = useState("Business");
+  const [results, setResults] = useState(allResults);
+
+  function handleSearch() {
+    const filtered = allResults.filter(function (r) {
+      const originOk = origin === "ALL" || r.origin === origin;
+      const destOk = destination === "ALL" || r.destination === destination;
+      const dateOk = date === "ALL" || r.date === date;
+      const cabinOk = cabin === "ALL" || r.cabin === cabin;
+      return originOk && destOk && dateOk && cabinOk;
+    });
+
+    setResults(filtered);
+  }
+
+  function handleReset() {
+    setOrigin("ALL");
+    setDestination("ALL");
+    setDate("ALL");
+    setCabin("Business");
+    setResults(allResults);
+  }
+
+  return (
+    <div style={{ fontFamily: "Arial, sans-serif", padding: 40, backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <h1>Award Travel Finder ✈️</h1>
+        <p>Search award routes with dropdowns.</p>
+
+        <div style={{ backgroundColor: "white", padding: 20, borderRadius: 12, marginBottom: 30 }}>
+          <h2>Search</h2>
+
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 15 }}>
+            <select value={origin} onChange={(e) => setOrigin(e.target.value)} style={{ padding: 10, minWidth: 160 }}>
+              {origins.map((o) => (
+                <option key={o} value={o}>{o === "ALL" ? "All origins" : o}</option>
+              ))}
+            </select>
+
+            <select value={destination} onChange={(e) => setDestination(e.target.value)} style={{ padding: 10, minWidth: 160 }}>
+              {destinations.map((d) => (
+                <option key={d} value={d}>{d === "ALL" ? "All destinations" : d}</option>
+              ))}
+            </select>
+
+            <select value={date} onChange={(e) => setDate(e.target.value)} style={{ padding: 10, minWidth: 180 }}>
+              <option value="ALL">All dates</option>
+              {dates.map((d) => (
+                <option key={d} value={d}>{d}</option>
+              ))}
+            </select>
+
+            <select value={cabin} onChange={(e) => setCabin(e.target.value)} style={{ padding: 10, minWidth: 160 }}>
+              <option value="Business">Business</option>
+              <option value="Economy">Economy</option>
+              <option value="ALL">All cabins</option>
+            </select>
+          </div>
+
+          <div style={{ display: "flex", gap: 10 }}>
+            <button onClick={handleSearch} style={{ padding: "10px 16px", backgroundColor: "black", color: "white", border: "none", borderRadius: 8 }}>
+              Find Awards
+            </button>
+            <button onClick={handleReset} style={{ padding: "10px 16px", backgroundColor: "white", color: "black", border: "1px solid #ccc", borderRadius: 8 }}>
+              Reset
+            </button>
+          </div>
+        </div>
+
+        <h2>Results ({results.length})</h2>
+
+        {results.length === 0 ? (
+          <div style={{ backgroundColor: "white", padding: 20, borderRadius: 12 }}>
+            No results found.
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 }}>
+            {results.map(function (r, i) {
+              return (
+                <div key={i} style={{ backgroundColor: "white", padding: 20, borderRadius: 12 }}>
+                  <h3>{r.program}</h3>
+                  <p>{r.origin} to {r.destination}</p>
+                  <p>{r.date}</p>
+                  <p><strong>{r.cabin}</strong></p>
+                  <p><strong>{r.miles.toLocaleString()}</strong> miles</p>
+                  <p><strong>${r.taxes}</strong> taxes</p>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
