@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 function makeDates() {
   const out = [];
@@ -29,159 +29,218 @@ const destinations = [
   "ZRH", "ATH", "IST", "DXB", "DOH", "MIA", "JFK", "DFW", "LAX", "IAH", "ORD"
 ];
 
-const allResults = [
-  { program: "Iberia Avios", origin: "BOG", destination: "MAD", date: "2026-06-10", cabin: "Business", miles: 42500, taxes: 120, notes: "Excellent nonstop sweet spot" },
-  { program: "Flying Blue", origin: "BOG", destination: "CDG", date: "2026-06-12", cabin: "Business", miles: 55000, taxes: 210, notes: "Good availability and transfer options" },
-  { program: "LifeMiles", origin: "MDE", destination: "MAD", date: "2026-06-10", cabin: "Business", miles: 63000, taxes: 78, notes: "Lower fees, one-stop option" },
-  { program: "Flying Blue", origin: "MDE", destination: "AMS", date: "2026-06-15", cabin: "Business", miles: 59000, taxes: 195, notes: "Strong Europe option from Medellin" },
-  { program: "Iberia Avios", origin: "MEX", destination: "MAD", date: "2026-07-01", cabin: "Business", miles: 51000, taxes: 150, notes: "Reliable Iberia sweet spot" },
-  { program: "Flying Blue", origin: "GRU", destination: "CDG", date: "2026-07-08", cabin: "Business", miles: 55000, taxes: 250, notes: "Good nonstop-style long-haul option" },
-  { program: "LifeMiles", origin: "LIM", destination: "MAD", date: "2026-08-05", cabin: "Business", miles: 65000, taxes: 85, notes: "Low-fee Star Alliance option" },
-  { program: "AAdvantage", origin: "BOG", destination: "MIA", date: "2026-06-20", cabin: "Business", miles: 30000, taxes: 80, notes: "Strong short-haul premium value" },
-  { program: "United", origin: "MDE", destination: "IAH", date: "2026-09-01", cabin: "Business", miles: 35000, taxes: 70, notes: "Easy booking from Medellin" },
-  { program: "Iberia Avios", origin: "CTG", destination: "MAD", date: "2026-10-10", cabin: "Economy", miles: 28000, taxes: 110, notes: "Economy fallback option" }
+const cabins = ["Business", "Economy", "ALL"];
+
+const routeTemplates = [
+  {
+    program: "Iberia Avios",
+    origin: "BOG",
+    destination: "MAD",
+    cabin: "Business",
+    baseMiles: 42500,
+    baseTaxes: 120,
+    baseCash: 2200,
+    transferPartners: ["Amex", "Chase", "Capital One"],
+    bookingInstructions: "Transfer points to Iberia Avios and book on Iberia.com."
+  },
+  {
+    program: "Flying Blue",
+    origin: "BOG",
+    destination: "CDG",
+    cabin: "Business",
+    baseMiles: 55000,
+    baseTaxes: 210,
+    baseCash: 2400,
+    transferPartners: ["Amex", "Chase", "Citi", "Capital One"],
+    bookingInstructions: "Transfer points to Flying Blue and book on Air France or KLM."
+  },
+  {
+    program: "LifeMiles",
+    origin: "MDE",
+    destination: "MAD",
+    cabin: "Business",
+    baseMiles: 63000,
+    baseTaxes: 78,
+    baseCash: 2100,
+    transferPartners: ["Amex", "Citi", "Capital One"],
+    bookingInstructions: "Transfer points to LifeMiles and search on LifeMiles.com."
+  },
+  {
+    program: "Flying Blue",
+    origin: "MDE",
+    destination: "AMS",
+    cabin: "Business",
+    baseMiles: 59000,
+    baseTaxes: 195,
+    baseCash: 2350,
+    transferPartners: ["Amex", "Chase", "Citi", "Capital One"],
+    bookingInstructions: "Transfer points to Flying Blue and book online."
+  },
+  {
+    program: "Iberia Avios",
+    origin: "MEX",
+    destination: "MAD",
+    cabin: "Business",
+    baseMiles: 51000,
+    baseTaxes: 150,
+    baseCash: 2400,
+    transferPartners: ["Amex", "Chase", "Capital One"],
+    bookingInstructions: "Transfer points to Iberia Avios and book on Iberia.com."
+  },
+  {
+    program: "Flying Blue",
+    origin: "GRU",
+    destination: "CDG",
+    cabin: "Business",
+    baseMiles: 55000,
+    baseTaxes: 250,
+    baseCash: 2700,
+    transferPartners: ["Amex", "Chase", "Citi", "Capital One"],
+    bookingInstructions: "Transfer points to Flying Blue and book on Air France."
+  },
+  {
+    program: "LifeMiles",
+    origin: "LIM",
+    destination: "MAD",
+    cabin: "Business",
+    baseMiles: 65000,
+    baseTaxes: 85,
+    baseCash: 2300,
+    transferPartners: ["Amex", "Citi", "Capital One"],
+    bookingInstructions: "Transfer points to LifeMiles and search Star Alliance options."
+  },
+  {
+    program: "AAdvantage",
+    origin: "BOG",
+    destination: "MIA",
+    cabin: "Business",
+    baseMiles: 30000,
+    baseTaxes: 80,
+    baseCash: 900,
+    transferPartners: ["Bilt"],
+    bookingInstructions: "Book directly through American Airlines using AAdvantage miles."
+  },
+  {
+    program: "United MileagePlus",
+    origin: "MDE",
+    destination: "IAH",
+    cabin: "Business",
+    baseMiles: 35000,
+    baseTaxes: 70,
+    baseCash: 950,
+    transferPartners: ["Chase", "Bilt"],
+    bookingInstructions: "Transfer Chase points to United and book on United.com."
+  },
+  {
+    program: "Iberia Avios",
+    origin: "CTG",
+    destination: "MAD",
+    cabin: "Economy",
+    baseMiles: 28000,
+    baseTaxes: 110,
+    baseCash: 700,
+    transferPartners: ["Amex", "Chase", "Capital One"],
+    bookingInstructions: "Transfer points to Iberia Avios and book on Iberia.com."
+  }
 ];
 
-function dateDiffDays(dateA, dateB) {
-  const a = new Date(dateA);
-  const b = new Date(dateB);
-  const diffMs = Math.abs(a - b);
-  return Math.round(diffMs / (1000 * 60 * 60 * 24));
+function hashString(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) {
+    h = (h * 31 + str.charCodeAt(i)) % 1000000;
+  }
+  return h;
+}
+
+function clamp(num, min, max) {
+  return Math.max(min, Math.min(max, num));
+}
+
+function calculateCpp(cashPrice, taxes, miles) {
+  if (!miles) return 0;
+  return Math.max(0, ((cashPrice - taxes) / miles) * 100);
+}
+
+function labelDeal(cpp) {
+  if (cpp >= 4.5) return "Excellent redemption";
+  if (cpp >= 3.2) return "Good redemption";
+  if (cpp >= 2.0) return "Average redemption";
+  return "Weak redemption";
+}
+
+function buildAllResults() {
+  const results = [];
+
+  routeTemplates.forEach((route) => {
+    dates.forEach((date) => {
+      const seed = hashString(
+        `${route.origin}-${route.destination}-${route.program}-${route.cabin}-${date}`
+      );
+
+      const milesFactor = ((seed % 11) - 5) * 0.03;
+      const taxesFactor = ((seed % 7) - 3) * 0.04;
+      const cashFactor = ((seed % 13) - 6) * 0.05;
+
+      const miles = Math.round(route.baseMiles * (1 + milesFactor) / 500) * 500;
+      const taxes = Math.round(clamp(route.baseTaxes * (1 + taxesFactor), 5, 1500));
+      const cashPrice = Math.round(clamp(route.baseCash * (1 + cashFactor), 60, 10000));
+
+      const cpp = calculateCpp(cashPrice, taxes, miles);
+
+      results.push({
+        program: route.program,
+        origin: route.origin,
+        destination: route.destination,
+        date,
+        cabin: route.cabin,
+        miles,
+        taxes,
+        cashPrice,
+        cpp,
+        dealLabel: labelDeal(cpp),
+        transferPartners: route.transferPartners,
+        bookingInstructions: route.bookingInstructions
+      });
+    });
+  });
+
+  return results;
+}
+
+const allResults = buildAllResults();
+
+function getBadges(results) {
+  const badges = {};
+  if (results.length === 0) return badges;
+
+  let bestOverall = 0;
+  let bestValue = 0;
+  let lowestMiles = 0;
+  let lowestCash = 0;
+
+  for (let i = 1; i < results.length; i++) {
+    const currentScore = results[i].cpp * 10 - results[i].taxes / 20;
+    const bestOverallScore = results[bestOverall].cpp * 10 - results[bestOverall].taxes / 20;
+
+    if (currentScore > bestOverallScore) bestOverall = i;
+    if (results[i].cpp > results[bestValue].cpp) bestValue = i;
+    if (results[i].miles < results[lowestMiles].miles) lowestMiles = i;
+    if (results[i].cashPrice < results[lowestCash].cashPrice) lowestCash = i;
+  }
+
+  badges[bestOverall] = "Best Overall";
+  if (bestValue !== bestOverall) badges[bestValue] = "Best Value";
+  if (lowestMiles !== bestOverall && lowestMiles !== bestValue) badges[lowestMiles] = "Lowest Miles";
+  if (
+    lowestCash !== bestOverall &&
+    lowestCash !== bestValue &&
+    lowestCash !== lowestMiles
+  ) {
+    badges[lowestCash] = "Lowest Cash";
+  }
+
+  return badges;
 }
 
 export default function Home() {
-  const [origin, setOrigin] = useState("ALL");
-  const [destination, setDestination] = useState("ALL");
-  const [date, setDate] = useState("ALL");
-  const [cabin, setCabin] = useState("Business");
-  const [results, setResults] = useState(allResults);
-  const [message, setMessage] = useState("Showing sample results.");
-
-  function handleSearch() {
-    let filtered = allResults.filter(function (r) {
-      const originOk = origin === "ALL" || r.origin === origin;
-      const destOk = destination === "ALL" || r.destination === destination;
-      const cabinOk = cabin === "ALL" || r.cabin === cabin;
-      return originOk && destOk && cabinOk;
-    });
-
-    if (date !== "ALL") {
-      const exactDateMatches = filtered.filter(function (r) {
-        return r.date === date;
-      });
-
-      if (exactDateMatches.length > 0) {
-        setResults(exactDateMatches);
-        setMessage(`Showing exact matches for ${date}.`);
-        return;
-      }
-
-      const nearbyDateMatches = filtered
-        .map(function (r) {
-          return {
-            ...r,
-            daysAway: dateDiffDays(r.date, date)
-          };
-        })
-        .filter(function (r) {
-          return r.daysAway <= 30;
-        })
-        .sort(function (a, b) {
-          return a.daysAway - b.daysAway;
-        });
-
-      if (nearbyDateMatches.length > 0) {
-        setResults(nearbyDateMatches);
-        setMessage(`No exact matches for ${date}. Showing nearest available dates instead.`);
-        return;
-      }
-    }
-
-    if (filtered.length > 0) {
-      setResults(filtered);
-      setMessage("No exact date match found. Showing available routes for your search.");
-      return;
-    }
-
-    setResults(allResults);
-    setMessage("No matching routes found. Showing all sample results instead.");
-  }
-
-  function handleReset() {
-    setOrigin("ALL");
-    setDestination("ALL");
-    setDate("ALL");
-    setCabin("Business");
-    setResults(allResults);
-    setMessage("Showing sample results.");
-  }
-
-  return (
-    <div style={{ fontFamily: "Arial, sans-serif", padding: 40, backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-        <h1>Award Travel Finder ✈️</h1>
-        <p>Search award routes with smarter fallback logic.</p>
-
-        <div style={{ backgroundColor: "white", padding: 20, borderRadius: 12, marginBottom: 30 }}>
-          <h2>Search</h2>
-
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 15 }}>
-            <select value={origin} onChange={(e) => setOrigin(e.target.value)} style={{ padding: 10, minWidth: 160 }}>
-              {origins.map((o) => (
-                <option key={o} value={o}>{o === "ALL" ? "All origins" : o}</option>
-              ))}
-            </select>
-
-            <select value={destination} onChange={(e) => setDestination(e.target.value)} style={{ padding: 10, minWidth: 160 }}>
-              {destinations.map((d) => (
-                <option key={d} value={d}>{d === "ALL" ? "All destinations" : d}</option>
-              ))}
-            </select>
-
-            <select value={date} onChange={(e) => setDate(e.target.value)} style={{ padding: 10, minWidth: 180 }}>
-              <option value="ALL">All dates</option>
-              {dates.map((d) => (
-                <option key={d} value={d}>{d}</option>
-              ))}
-            </select>
-
-            <select value={cabin} onChange={(e) => setCabin(e.target.value)} style={{ padding: 10, minWidth: 160 }}>
-              <option value="Business">Business</option>
-              <option value="Economy">Economy</option>
-              <option value="ALL">All cabins</option>
-            </select>
-          </div>
-
-          <div style={{ display: "flex", gap: 10 }}>
-            <button onClick={handleSearch} style={{ padding: "10px 16px", backgroundColor: "black", color: "white", border: "none", borderRadius: 8 }}>
-              Find Awards
-            </button>
-            <button onClick={handleReset} style={{ padding: "10px 16px", backgroundColor: "white", color: "black", border: "1px solid #ccc", borderRadius: 8 }}>
-              Reset
-            </button>
-          </div>
-        </div>
-
-        <h2>Results ({results.length})</h2>
-        <p style={{ color: "#666", marginBottom: 20 }}>{message}</p>
-
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 }}>
-          {results.map(function (r, i) {
-            return (
-              <div key={i} style={{ backgroundColor: "white", padding: 20, borderRadius: 12 }}>
-                <h3>{r.program}</h3>
-                <p>{r.origin} to {r.destination}</p>
-                <p>{r.date}</p>
-                {"daysAway" in r ? <p><strong>{r.daysAway} days away from selected date</strong></p> : null}
-                <p><strong>{r.cabin}</strong></p>
-                <p><strong>{r.miles.toLocaleString()}</strong> miles</p>
-                <p><strong>${r.taxes}</strong> taxes</p>
-                <p>{r.notes}</p>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-}
+  const [origin, setOrigin] = use
