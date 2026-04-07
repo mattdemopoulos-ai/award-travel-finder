@@ -1,28 +1,6 @@
-import { useMemo, useState } from "react";
+import { cities } from "./data/cities";
 
-const cities = [
-  { city: "Medellin", airport: "MDE", region: "Latin America" },
-  { city: "Bogota", airport: "BOG", region: "Latin America" },
-  { city: "Mexico City", airport: "MEX", region: "Latin America" },
-  { city: "Lima", airport: "LIM", region: "Latin America" },
-  { city: "Sao Paulo", airport: "GRU", region: "Latin America" },
-  { city: "Buenos Aires", airport: "EZE", region: "Latin America" },
-  { city: "Miami", airport: "MIA", region: "United States" },
-  { city: "New York", airport: "JFK", region: "United States" },
-  { city: "Dallas", airport: "DFW", region: "United States" },
-  { city: "Houston", airport: "IAH", region: "United States" },
-  { city: "Los Angeles", airport: "LAX", region: "United States" },
-  { city: "Madrid", airport: "MAD", region: "Europe" },
-  { city: "Paris", airport: "CDG", region: "Europe" },
-  { city: "London", airport: "LHR", region: "Europe" },
-  { city: "Amsterdam", airport: "AMS", region: "Europe" },
-  { city: "Rome", airport: "FCO", region: "Europe" },
-  { city: "Tokyo", airport: "HND", region: "Asia" },
-  { city: "Bangkok", airport: "BKK", region: "Asia" },
-  { city: "Singapore", airport: "SIN", region: "Asia" },
-  { city: "Seoul", airport: "ICN", region: "Asia" },
-  { city: "Dubai", airport: "DXB", region: "Asia" }
-];
+import { useMemo, useState } from "react";
 
 const rewardsPrograms = [
   { name: "American AAdvantage", alliance: "oneworld", url: "https://www.aa.com/" },
