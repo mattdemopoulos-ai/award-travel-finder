@@ -1,4 +1,4 @@
-import { cities } from "./data/cities";
+import { cities } from "../data/cities";
 
 import { useMemo, useState } from "react";
 
