@@ -1,4 +1,27 @@
-export const cities = [
+export type Region = "Latin America" | "United States" | "Europe" | "Asia";
+export type ProgramType = "airline" | "hotel";
+
+export type City = {
+  city: string;
+  airport: string;
+  region: Region;
+};
+
+export type RewardsProgram = {
+  name: string;
+  type: ProgramType;
+  alliance: string;
+  transferPartners: string[];
+};
+
+export type AirlineInfo = {
+  name: string;
+  emoji: string;
+  cashUrl: string;
+  pointsUrl: string;
+};
+
+export const cities: City[] = [
   // Latin America (100)
   { city: "Mexico City", airport: "MEX", region: "Latin America" },
   { city: "Sao Paulo", airport: "GRU", region: "Latin America" },
@@ -37,7 +60,7 @@ export const cities = [
   { city: "San Jose", airport: "SJO", region: "Latin America" },
   { city: "San Salvador", airport: "SAL", region: "Latin America" },
   { city: "Guatemala City", airport: "GUA", region: "Latin America" },
-  { city: "Tegucigalpa", airport: "XPL", region: "Latin America" },
+  { city: "Tegucigalpa", airport: "TGU", region: "Latin America" },
   { city: "Managua", airport: "MGA", region: "Latin America" },
   { city: "Santo Domingo", airport: "SDQ", region: "Latin America" },
   { city: "Punta Cana", airport: "PUJ", region: "Latin America" },
@@ -88,8 +111,8 @@ export const cities = [
   { city: "Antofagasta", airport: "ANF", region: "Latin America" },
   { city: "Puerto Montt", airport: "PMC", region: "Latin America" },
   { city: "Temuco", airport: "ZCO", region: "Latin America" },
-  { city: "Maracaibo", airport: "MAR", region: "Latin America" },
   { city: "Caracas", airport: "CCS", region: "Latin America" },
+  { city: "Maracaibo", airport: "MAR", region: "Latin America" },
   { city: "Valencia", airport: "VLN", region: "Latin America" },
   { city: "Barquisimeto", airport: "BRM", region: "Latin America" },
   { city: "Maturin", airport: "MUN", region: "Latin America" },
@@ -214,10 +237,8 @@ export const cities = [
   { city: "Osaka", airport: "KIX", region: "Asia" },
   { city: "Karachi", airport: "KHI", region: "Asia" },
   { city: "Chongqing", airport: "CKG", region: "Asia" },
-  { city: "Istanbul", airport: "IST", region: "Asia" },
   { city: "Kolkata", airport: "CCU", region: "Asia" },
   { city: "Manila", airport: "MNL", region: "Asia" },
-  { city: "Foshan", airport: "CAN", region: "Asia" }
   { city: "Tianjin", airport: "TSN", region: "Asia" },
   { city: "Guangzhou", airport: "CAN", region: "Asia" },
   { city: "Lahore", airport: "LHE", region: "Asia" },
@@ -254,10 +275,12 @@ export const cities = [
   { city: "Tashkent", airport: "TAS", region: "Asia" },
   { city: "Doha", airport: "DOH", region: "Asia" },
   { city: "Dubai", airport: "DXB", region: "Asia" },
-  { city: "Abu Dhabi", airport: "AUH", region: "Asia" }
+  { city: "Abu Dhabi", airport: "AUH", region: "Asia" },
+  { city: "Foshan", airport: "CAN", region: "Asia" },
+  { city: "Surabaya", airport: "SUB", region: "Asia" }
 ];
 
-export const rewardsPrograms = [
+export const rewardsPrograms: RewardsProgram[] = [
   { name: "American AAdvantage", type: "airline", alliance: "oneworld", transferPartners: ["Bilt", "Marriott"] },
   { name: "Alaska Mileage Plan", type: "airline", alliance: "oneworld", transferPartners: ["Bilt", "Marriott"] },
   { name: "United MileagePlus", type: "airline", alliance: "Star Alliance", transferPartners: ["Chase", "Bilt", "Marriott"] },
@@ -285,7 +308,7 @@ export const rewardsPrograms = [
   { name: "IHG One Rewards", type: "hotel", alliance: "Hotel", transferPartners: ["Chase", "Bilt"] }
 ];
 
-export const airlineInfo = {
+export const airlineInfo: Record<string, AirlineInfo> = {
   "American AAdvantage": { name: "American Airlines", emoji: "🇺🇸", cashUrl: "https://www.aa.com/", pointsUrl: "https://www.aa.com/" },
   "Alaska Mileage Plan": { name: "Alaska Airlines", emoji: "🇺🇸", cashUrl: "https://www.alaskaair.com/", pointsUrl: "https://www.alaskaair.com/" },
   "United MileagePlus": { name: "United Airlines", emoji: "🇺🇸", cashUrl: "https://www.united.com/", pointsUrl: "https://www.united.com/" },
@@ -311,4 +334,4 @@ export const airlineInfo = {
   "Marriott Bonvoy": { name: "Marriott", emoji: "🏨", cashUrl: "https://www.marriott.com/", pointsUrl: "https://www.marriott.com/" },
   "World of Hyatt": { name: "Hyatt", emoji: "🏨", cashUrl: "https://world.hyatt.com/", pointsUrl: "https://world.hyatt.com/" },
   "IHG One Rewards": { name: "IHG", emoji: "🏨", cashUrl: "https://www.ihg.com/", pointsUrl: "https://www.ihg.com/" }
-} as const;
+};
