@@ -44,9 +44,8 @@ function generateMockResults(fromAirport, toAirport, date, cabin) {
     const baseMiles = 12000 + ((seed + i * 5300) % 90000);
 
     const cash = Math.round(baseCash * cabinConfig.cash);
-    const miles = Math.round(baseMiles * cabinConfig.miles / 500) * 500;
+    const miles = Math.round((baseMiles * cabinConfig.miles) / 500) * 500;
     const cpp = Number(((cash * 100) / miles).toFixed(1));
-
     const duration = 6 + ((seed + i * 3) % 10);
     const stops = (seed + i) % 3;
 
@@ -74,7 +73,8 @@ function Pill({ children, active, gold }) {
         fontSize: 12,
         fontWeight: 700,
         background: gold ? "#fef3c7" : active ? "#dbeafe" : "#f1f5f9",
-        color: gold ? "#92400e" : active ? "#1d4ed8" : "#475569"
+        color: gold ? "#92400e" : active ? "#1d4ed8" : "#475569",
+        whiteSpace: "nowrap"
       }}
     >
       {children}
@@ -96,11 +96,11 @@ function StatCard({ label, value, subvalue }) {
       <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>
         {label}
       </div>
-      <div style={{ fontSize: 26, fontWeight: 800, color: "#0f172a", marginTop: 8 }}>
+      <div style={{ fontSize: 26, fontWeight: 800, color: "#0f172a", marginTop: 8, wordBreak: "break-word" }}>
         {value}
       </div>
       {subvalue ? (
-        <div style={{ fontSize: 13, color: "#64748b", marginTop: 6 }}>
+        <div style={{ fontSize: 13, color: "#64748b", marginTop: 6, wordBreak: "break-word" }}>
           {subvalue}
         </div>
       ) : null}
@@ -173,7 +173,9 @@ function AirportAutocomplete({ label, value, onChange, excludeAirport }) {
             borderRadius: 16,
             boxShadow: "0 16px 40px rgba(15,23,42,0.12)",
             overflow: "hidden",
-            zIndex: 50
+            zIndex: 50,
+            maxHeight: 320,
+            overflowY: "auto"
           }}
         >
           {filteredCities.map((c) => (
@@ -206,7 +208,24 @@ function AirportAutocomplete({ label, value, onChange, excludeAirport }) {
   );
 }
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    function check() {
+      setIsMobile(window.innerWidth < 900);
+    }
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  return isMobile;
+}
+
 export default function Home() {
+  const isMobile = useIsMobile();
+
   const [fromInput, setFromInput] = useState("Medellin (MDE)");
   const [toInput, setToInput] = useState("Madrid (MAD)");
   const [date, setDate] = useState("");
@@ -253,14 +272,14 @@ export default function Home() {
         background:
           "radial-gradient(circle at top left, #dbeafe 0%, #eff6ff 28%, #f8fafc 58%, #ffffff 100%)",
         fontFamily: "Inter, system-ui, sans-serif",
-        padding: "32px 20px 60px"
+        padding: isMobile ? "16px 12px 40px" : "32px 20px 60px"
       }}
     >
       <div style={{ maxWidth: 1180, margin: "0 auto" }}>
         <section
           style={{
             display: "grid",
-            gridTemplateColumns: "1.3fr 0.9fr",
+            gridTemplateColumns: isMobile ? "1fr" : "1.3fr 0.9fr",
             gap: 20,
             alignItems: "stretch",
             marginBottom: 24
@@ -271,7 +290,7 @@ export default function Home() {
               background: "linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #2563eb 100%)",
               color: "#fff",
               borderRadius: 28,
-              padding: 32,
+              padding: isMobile ? 22 : 32,
               boxShadow: "0 24px 60px rgba(30,64,175,0.20)"
             }}
           >
@@ -291,11 +310,26 @@ export default function Home() {
               Award Travel Search
             </div>
 
-            <h1 style={{ fontSize: 48, lineHeight: 1.04, margin: "18px 0 14px", fontWeight: 900 }}>
+            <h1
+              style={{
+                fontSize: isMobile ? 34 : 48,
+                lineHeight: 1.04,
+                margin: "18px 0 14px",
+                fontWeight: 900
+              }}
+            >
               Find the best points deal in seconds
             </h1>
 
-            <p style={{ fontSize: 18, lineHeight: 1.6, color: "rgba(255,255,255,0.86)", maxWidth: 680, margin: 0 }}>
+            <p
+              style={{
+                fontSize: isMobile ? 16 : 18,
+                lineHeight: 1.6,
+                color: "rgba(255,255,255,0.86)",
+                maxWidth: 680,
+                margin: 0
+              }}
+            >
               Compare miles, cash, cabin class, value per point, and booking options across major loyalty programs.
             </p>
 
@@ -311,7 +345,7 @@ export default function Home() {
               background: "rgba(255,255,255,0.92)",
               border: "1px solid #dbe7ff",
               borderRadius: 28,
-              padding: 24,
+              padding: isMobile ? 18 : 24,
               boxShadow: "0 16px 40px rgba(15,23,42,0.06)"
             }}
           >
@@ -331,7 +365,7 @@ export default function Home() {
             background: "rgba(255,255,255,0.92)",
             border: "1px solid #dbe7ff",
             borderRadius: 28,
-            padding: 22,
+            padding: isMobile ? 16 : 22,
             boxShadow: "0 18px 50px rgba(37,99,235,0.08)",
             marginBottom: 24
           }}
@@ -339,7 +373,7 @@ export default function Home() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "1.15fr 1.15fr 0.9fr auto",
+              gridTemplateColumns: isMobile ? "1fr" : "1.15fr 1.15fr 0.9fr auto",
               gap: 14,
               marginBottom: 16
             }}
@@ -397,7 +431,7 @@ export default function Home() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "1fr 1fr 1fr 1fr",
+              gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr 1fr",
               gap: 14
             }}
           >
@@ -466,17 +500,17 @@ export default function Home() {
               background: "linear-gradient(135deg, #eff6ff 0%, #ffffff 100%)",
               border: "1px solid #bfdbfe",
               borderRadius: 24,
-              padding: 22,
+              padding: isMobile ? 16 : 22,
               marginBottom: 20,
               boxShadow: "0 10px 30px rgba(37,99,235,0.08)"
             }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", gap: 16, alignItems: isMobile ? "stretch" : "center", flexWrap: "wrap" }}>
               <div>
                 <div style={{ fontSize: 12, fontWeight: 800, color: "#2563eb", textTransform: "uppercase", letterSpacing: 0.6 }}>
                   Best option right now
                 </div>
-                <div style={{ fontSize: 30, fontWeight: 900, color: "#0f172a", marginTop: 8 }}>
+                <div style={{ fontSize: isMobile ? 24 : 30, fontWeight: 900, color: "#0f172a", marginTop: 8 }}>
                   {bestResult.program}
                 </div>
                 <div style={{ marginTop: 8, display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -487,7 +521,14 @@ export default function Home() {
                 </div>
               </div>
 
-              <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: isMobile ? "1fr" : "repeat(3, minmax(140px, 1fr))",
+                  gap: 12,
+                  width: isMobile ? "100%" : "auto"
+                }}
+              >
                 <StatCard label="Cash" value={`$${bestResult.cash}`} />
                 <StatCard label="Miles" value={bestResult.miles.toLocaleString()} />
                 <StatCard label="Value" value={`${bestResult.cpp}¢/pt`} />
@@ -505,9 +546,19 @@ export default function Home() {
             boxShadow: "0 16px 40px rgba(15,23,42,0.05)"
           }}
         >
-          <div style={{ padding: 22, borderBottom: "1px solid #eef2f7", display: "flex", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+          <div
+            style={{
+              padding: isMobile ? 16 : 22,
+              borderBottom: "1px solid #eef2f7",
+              display: "flex",
+              flexDirection: isMobile ? "column" : "row",
+              justifyContent: "space-between",
+              gap: 16,
+              flexWrap: "wrap"
+            }}
+          >
             <div>
-              <h2 style={{ margin: 0, fontSize: 24, color: "#0f172a" }}>Results</h2>
+              <h2 style={{ margin: 0, fontSize: isMobile ? 20 : 24, color: "#0f172a" }}>Results</h2>
               <div style={{ marginTop: 6, color: "#64748b", fontSize: 14 }}>
                 {searched ? `${results.length} result${results.length === 1 ? "" : "s"} found` : "Search a route to see ranked options"}
               </div>
@@ -525,7 +576,7 @@ export default function Home() {
           ) : results.length === 0 ? (
             <div style={{ padding: 28, color: "#64748b" }}>Please choose valid From, To, and Date.</div>
           ) : (
-            <div style={{ padding: 16 }}>
+            <div style={{ padding: isMobile ? 12 : 16 }}>
               {results.map((r, idx) => {
                 const isBest = bestResult && r.program === bestResult.program;
                 const isCheapestCash = lowestCash && r.program === lowestCash.program;
@@ -535,67 +586,108 @@ export default function Home() {
                   <div
                     key={r.program}
                     style={{
-                      display: "grid",
-                      gridTemplateColumns: "1.7fr 0.9fr 0.9fr 0.9fr 0.9fr auto",
-                      gap: 12,
-                      alignItems: "center",
-                      padding: 18,
+                      padding: isMobile ? 14 : 18,
                       borderRadius: 18,
                       background: isBest ? "#f8fbff" : "#fff",
                       border: isBest ? "1px solid #bfdbfe" : "1px solid #eef2f7",
                       marginBottom: 12
                     }}
                   >
-                    <div>
-                      <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-                        <div style={{ fontWeight: 800, color: "#0f172a", fontSize: 17 }}>{r.program}</div>
-                        {isBest && <Pill active>Best value</Pill>}
-                        {isCheapestCash && <Pill gold>Cheapest cash</Pill>}
-                        {isLowestMiles && <Pill>Lowest miles</Pill>}
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: isMobile ? "1fr" : "1.7fr 0.9fr 0.9fr 0.9fr 0.9fr auto",
+                        gap: 12,
+                        alignItems: "center"
+                      }}
+                    >
+                      <div>
+                        <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                          <div style={{ fontWeight: 800, color: "#0f172a", fontSize: 17 }}>{r.program}</div>
+                          {isBest && <Pill active>Best value</Pill>}
+                          {isCheapestCash && <Pill gold>Cheapest cash</Pill>}
+                          {isLowestMiles && <Pill>Lowest miles</Pill>}
+                        </div>
+                        <div style={{ fontSize: 13, color: "#64748b", marginTop: 6 }}>
+                          {r.alliance} • {r.cabin} • {r.duration} • {r.stops === 0 ? "Nonstop" : `${r.stops} stop${r.stops > 1 ? "s" : ""}`}
+                        </div>
                       </div>
-                      <div style={{ fontSize: 13, color: "#64748b", marginTop: 6 }}>
-                        {r.alliance} • {r.cabin} • {r.duration} • {r.stops === 0 ? "Nonstop" : `${r.stops} stop${r.stops > 1 ? "s" : ""}`}
+
+                      {isMobile ? (
+                        <div
+                          style={{
+                            display: "grid",
+                            gridTemplateColumns: "1fr 1fr",
+                            gap: 12,
+                            marginTop: 4
+                          }}
+                        >
+                          <div>
+                            <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>Cash</div>
+                            <div style={{ fontWeight: 800, fontSize: 18, color: "#0f172a" }}>${r.cash}</div>
+                          </div>
+
+                          <div>
+                            <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>Miles</div>
+                            <div style={{ fontWeight: 800, fontSize: 18, color: "#0f172a" }}>{r.miles.toLocaleString()}</div>
+                          </div>
+
+                          <div>
+                            <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>Value</div>
+                            <div style={{ fontWeight: 800, fontSize: 18, color: "#0f172a" }}>{r.cpp}¢/pt</div>
+                          </div>
+
+                          <div>
+                            <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>Rank</div>
+                            <div style={{ fontWeight: 800, fontSize: 18, color: "#0f172a" }}>#{idx + 1}</div>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <div>
+                            <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>Cash</div>
+                            <div style={{ fontWeight: 800, fontSize: 18, color: "#0f172a" }}>${r.cash}</div>
+                          </div>
+
+                          <div>
+                            <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>Miles</div>
+                            <div style={{ fontWeight: 800, fontSize: 18, color: "#0f172a" }}>{r.miles.toLocaleString()}</div>
+                          </div>
+
+                          <div>
+                            <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>Value</div>
+                            <div style={{ fontWeight: 800, fontSize: 18, color: "#0f172a" }}>{r.cpp}¢/pt</div>
+                          </div>
+
+                          <div>
+                            <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>Rank</div>
+                            <div style={{ fontWeight: 800, fontSize: 18, color: "#0f172a" }}>#{idx + 1}</div>
+                          </div>
+                        </>
+                      )}
+
+                      <div style={{ marginTop: isMobile ? 8 : 0 }}>
+                        <a
+                          href={r.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{
+                            display: "inline-block",
+                            width: isMobile ? "100%" : "auto",
+                            textAlign: "center",
+                            padding: "11px 16px",
+                            borderRadius: 12,
+                            background: "#0f172a",
+                            color: "#fff",
+                            textDecoration: "none",
+                            fontSize: 14,
+                            fontWeight: 800,
+                            boxSizing: "border-box"
+                          }}
+                        >
+                          Book
+                        </a>
                       </div>
-                    </div>
-
-                    <div>
-                      <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>Cash</div>
-                      <div style={{ fontWeight: 800, fontSize: 18, color: "#0f172a" }}>${r.cash}</div>
-                    </div>
-
-                    <div>
-                      <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>Miles</div>
-                      <div style={{ fontWeight: 800, fontSize: 18, color: "#0f172a" }}>{r.miles.toLocaleString()}</div>
-                    </div>
-
-                    <div>
-                      <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>Value</div>
-                      <div style={{ fontWeight: 800, fontSize: 18, color: "#0f172a" }}>{r.cpp}¢/pt</div>
-                    </div>
-
-                    <div>
-                      <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>Rank</div>
-                      <div style={{ fontWeight: 800, fontSize: 18, color: "#0f172a" }}>#{idx + 1}</div>
-                    </div>
-
-                    <div>
-                      <a
-                        href={r.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        style={{
-                          display: "inline-block",
-                          padding: "11px 16px",
-                          borderRadius: 12,
-                          background: "#0f172a",
-                          color: "#fff",
-                          textDecoration: "none",
-                          fontSize: 14,
-                          fontWeight: 800
-                        }}
-                      >
-                        Book
-                      </a>
                     </div>
                   </div>
                 );
