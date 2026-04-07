@@ -1,23 +1,22 @@
-export const cities = [
+import { useMemo, useState } from "react";
+
+const cities = [
   { city: "Medellin", airport: "MDE", region: "Latin America" },
   { city: "Bogota", airport: "BOG", region: "Latin America" },
   { city: "Mexico City", airport: "MEX", region: "Latin America" },
   { city: "Lima", airport: "LIM", region: "Latin America" },
   { city: "Sao Paulo", airport: "GRU", region: "Latin America" },
   { city: "Buenos Aires", airport: "EZE", region: "Latin America" },
-
   { city: "Miami", airport: "MIA", region: "United States" },
   { city: "New York", airport: "JFK", region: "United States" },
   { city: "Dallas", airport: "DFW", region: "United States" },
   { city: "Houston", airport: "IAH", region: "United States" },
   { city: "Los Angeles", airport: "LAX", region: "United States" },
-
   { city: "Madrid", airport: "MAD", region: "Europe" },
   { city: "Paris", airport: "CDG", region: "Europe" },
   { city: "London", airport: "LHR", region: "Europe" },
   { city: "Amsterdam", airport: "AMS", region: "Europe" },
   { city: "Rome", airport: "FCO", region: "Europe" },
-
   { city: "Tokyo", airport: "HND", region: "Asia" },
   { city: "Bangkok", airport: "BKK", region: "Asia" },
   { city: "Singapore", airport: "SIN", region: "Asia" },
@@ -25,7 +24,7 @@ export const cities = [
   { city: "Dubai", airport: "DXB", region: "Asia" }
 ];
 
-export const rewardsPrograms = [
+const rewardsPrograms = [
   { name: "American AAdvantage", type: "airline", alliance: "oneworld" },
   { name: "Alaska Mileage Plan", type: "airline", alliance: "oneworld" },
   { name: "United MileagePlus", type: "airline", alliance: "Star Alliance" },
@@ -53,15 +52,73 @@ export const rewardsPrograms = [
   { name: "IHG One Rewards", type: "hotel", alliance: "Hotel" }
 ];
 
-export const airlineInfo = {
-  "American AAdvantage": { name: "American Airlines", emoji: "🇺🇸", cashUrl: "https://www.aa.com/", pointsUrl: "https://www.aa.com/" },
-  "Alaska Mileage Plan": { name: "Alaska Airlines", emoji: "🇺🇸", cashUrl: "https://www.alaskaair.com/", pointsUrl: "https://www.alaskaair.com/" },
-  "United MileagePlus": { name: "United Airlines", emoji: "🇺🇸", cashUrl: "https://www.united.com/", pointsUrl: "https://www.united.com/" },
-  "Delta SkyMiles": { name: "Delta", emoji: "🇺🇸", cashUrl: "https://www.delta.com/", pointsUrl: "https://www.delta.com/" },
-  "Air Canada Aeroplan": { name: "Air Canada", emoji: "🇨🇦", cashUrl: "https://www.aircanada.com/", pointsUrl: "https://www.aircanada.com/" },
-  "Flying Blue": { name: "Air France / KLM", emoji: "🇫🇷", cashUrl: "https://www.flyingblue.com/", pointsUrl: "https://www.flyingblue.com/" },
-  "British Airways Executive Club": { name: "British Airways", emoji: "🇬🇧", cashUrl: "https://www.britishairways.com/", pointsUrl: "https://www.britishairways.com/" },
-  "Iberia Plus": { name: "Iberia", emoji: "🇪🇸", cashUrl: "https://www.iberia.com/", pointsUrl: "https://www.iberia.com/" },
-  "Qatar Airways Privilege Club": { name: "Qatar Airways", emoji: "🇶🇦", cashUrl: "https://www.qatarairways.com/", pointsUrl: "https://www.qatarairways.com/" },
-  "Avianca LifeMiles": { name: "Avianca", emoji: "🇨🇴", cashUrl: "https://www.avianca.com/", pointsUrl: "https://www.lifemiles.com/" }
-};
+export default function Home() {
+  const [from, setFrom] = useState("MDE");
+  const [to, setTo] = useState("MAD");
+  const [search, setSearch] = useState("");
+
+  const filteredCities = useMemo(() => {
+    const q = search.toLowerCase();
+    return cities.filter(
+      (c) =>
+        c.city.toLowerCase().includes(q) ||
+        c.airport.toLowerCase().includes(q) ||
+        c.region.toLowerCase().includes(q)
+    );
+  }, [search]);
+
+  return (
+    <main style={{ fontFamily: "Arial, sans-serif", padding: 24, maxWidth: 1000, margin: "0 auto" }}>
+      <h1>Award Travel Finder</h1>
+
+      <div style={{ display: "grid", gap: 12, marginBottom: 24 }}>
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search cities or airports"
+          style={{ padding: 12, fontSize: 16 }}
+        />
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <select value={from} onChange={(e) => setFrom(e.target.value)} style={{ padding: 12 }}>
+            {cities.map((c) => (
+              <option key={`${c.airport}-from`} value={c.airport}>
+                {c.city} ({c.airport})
+              </option>
+            ))}
+          </select>
+
+          <select value={to} onChange={(e) => setTo(e.target.value)} style={{ padding: 12 }}>
+            {cities.map((c) => (
+              <option key={`${c.airport}-to`} value={c.airport}>
+                {c.city} ({c.airport})
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div style={{ marginBottom: 24 }}>
+        <strong>Route:</strong> {from} → {to}
+      </div>
+
+      <h2>Rewards Programs</h2>
+      <ul>
+        {rewardsPrograms.map((p) => (
+          <li key={p.name}>
+            {p.name} — {p.type} — {p.alliance}
+          </li>
+        ))}
+      </ul>
+
+      <h2>Matching Cities</h2>
+      <ul>
+        {filteredCities.map((c) => (
+          <li key={`${c.city}-${c.airport}`}>
+            {c.city} ({c.airport}) — {c.region}
+          </li>
+        ))}
+      </ul>
+    </main>
+  );
+}
