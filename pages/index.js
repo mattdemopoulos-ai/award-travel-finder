@@ -68,19 +68,41 @@ export default function Home() {
   }, [search]);
 
   return (
-    <main style={{ fontFamily: "Arial, sans-serif", padding: 24, maxWidth: 1000, margin: "0 auto" }}>
-      <h1>Award Travel Finder</h1>
+  <main style={{
+    fontFamily: "Inter, system-ui, sans-serif",
+    background: "#f8fafc",
+    minHeight: "100vh",
+    padding: "40px 20px"
+  }}>
+    <div style={{ maxWidth: 900, margin: "0 auto" }}>
+      
+      <h1 style={{ fontSize: 32, marginBottom: 20 }}>
+        ✈️ Award Travel Finder
+      </h1>
 
-      <div style={{ display: "grid", gap: 12, marginBottom: 24 }}>
+      <div style={{
+        background: "white",
+        padding: 20,
+        borderRadius: 12,
+        boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+        marginBottom: 20
+      }}>
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search cities or airports"
-          style={{ padding: 12, fontSize: 16 }}
+          style={{
+            width: "100%",
+            padding: 14,
+            fontSize: 16,
+            borderRadius: 8,
+            border: "1px solid #ddd",
+            marginBottom: 12
+          }}
         />
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          <select value={from} onChange={(e) => setFrom(e.target.value)} style={{ padding: 12 }}>
+        <div style={{ display: "flex", gap: 10 }}>
+          <select value={from} onChange={(e) => setFrom(e.target.value)} style={{ flex: 1, padding: 12 }}>
             {cities.map((c) => (
               <option key={`${c.airport}-from`} value={c.airport}>
                 {c.city} ({c.airport})
@@ -88,7 +110,7 @@ export default function Home() {
             ))}
           </select>
 
-          <select value={to} onChange={(e) => setTo(e.target.value)} style={{ padding: 12 }}>
+          <select value={to} onChange={(e) => setTo(e.target.value)} style={{ flex: 1, padding: 12 }}>
             {cities.map((c) => (
               <option key={`${c.airport}-to`} value={c.airport}>
                 {c.city} ({c.airport})
@@ -96,29 +118,59 @@ export default function Home() {
             ))}
           </select>
         </div>
+
+        <div style={{ marginTop: 12, fontWeight: 500 }}>
+          Route: {from} → {to}
+        </div>
       </div>
 
-      <div style={{ marginBottom: 24 }}>
-        <strong>Route:</strong> {from} → {to}
+      <div style={{
+        background: "white",
+        padding: 20,
+        borderRadius: 12,
+        boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+        marginBottom: 20
+      }}>
+        <h2 style={{ marginBottom: 10 }}>Rewards Programs</h2>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+          {rewardsPrograms.map((p) => (
+            <div key={p.name} style={{
+              padding: 10,
+              border: "1px solid #eee",
+              borderRadius: 8
+            }}>
+              <strong>{p.name}</strong>
+              <div style={{ fontSize: 12, color: "#666" }}>
+                {p.type} • {p.alliance}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
-      <h2>Rewards Programs</h2>
-      <ul>
-        {rewardsPrograms.map((p) => (
-          <li key={p.name}>
-            {p.name} — {p.type} — {p.alliance}
-          </li>
-        ))}
-      </ul>
+      <div style={{
+        background: "white",
+        padding: 20,
+        borderRadius: 12,
+        boxShadow: "0 4px 20px rgba(0,0,0,0.05)"
+      }}>
+        <h2 style={{ marginBottom: 10 }}>Matching Cities</h2>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+          {filteredCities.map((c) => (
+            <div key={`${c.city}-${c.airport}`} style={{
+              padding: 10,
+              border: "1px solid #eee",
+              borderRadius: 8
+            }}>
+              {c.city} ({c.airport})
+              <div style={{ fontSize: 12, color: "#666" }}>
+                {c.region}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
-      <h2>Matching Cities</h2>
-      <ul>
-        {filteredCities.map((c) => (
-          <li key={`${c.city}-${c.airport}`}>
-            {c.city} ({c.airport}) — {c.region}
-          </li>
-        ))}
-      </ul>
-    </main>
-  );
-}
+    </div>
+  </main>
+);
