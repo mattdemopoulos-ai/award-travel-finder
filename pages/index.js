@@ -14,6 +14,13 @@ const rewardsPrograms = [
   { name: "Avianca LifeMiles", alliance: "Star Alliance", url: "https://www.lifemiles.com/" }
 ];
 
+const cabinMultipliers = {
+  Economy: { cash: 1, miles: 1 },
+  Premium: { cash: 1.35, miles: 1.45 },
+  Business: { cash: 2.2, miles: 2.4 },
+  First: { cash: 3.8, miles: 4.1 }
+};
+
 function formatCityLabel(cityObj) {
   return `${cityObj.city} (${cityObj.airport})`;
 }
@@ -23,17 +30,23 @@ function parseAirport(input) {
   return match ? match[1] : "";
 }
 
-function generateMockResults(fromAirport, toAirport, date) {
+function generateMockResults(fromAirport, toAirport, date, cabin) {
   if (!fromAirport || !toAirport || !date || fromAirport === toAirport) return [];
 
-  const seed = (fromAirport + toAirport + date)
+  const seed = (fromAirport + toAirport + date + cabin)
     .split("")
     .reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
 
+  const cabinConfig = cabinMultipliers[cabin] || cabinMultipliers.Economy;
+
   return rewardsPrograms.map((program, i) => {
-    const cash = 220 + ((seed + i * 41) % 950);
-    const miles = 12000 + ((seed + i * 5300) % 90000);
-    const cpp = ((cash * 100) / miles).toFixed(1);
+    const baseCash = 220 + ((seed + i * 41) % 950);
+    const baseMiles = 12000 + ((seed + i * 5300) % 90000);
+
+    const cash = Math.round(baseCash * cabinConfig.cash);
+    const miles = Math.round(baseMiles * cabinConfig.miles / 500) * 500;
+    const cpp = Number(((cash * 100) / miles).toFixed(1));
+
     const duration = 6 + ((seed + i * 3) % 10);
     const stops = (seed + i) % 3;
 
@@ -42,15 +55,16 @@ function generateMockResults(fromAirport, toAirport, date) {
       alliance: program.alliance,
       cash,
       miles,
-      cpp: Number(cpp),
+      cpp,
       duration: `${duration}h ${((seed + i * 17) % 60).toString().padStart(2, "0")}m`,
       stops,
-      url: program.url
+      url: program.url,
+      cabin
     };
   });
 }
 
-function Pill({ children, active }) {
+function Pill({ children, active, gold }) {
   return (
     <span
       style={{
@@ -59,8 +73,8 @@ function Pill({ children, active }) {
         borderRadius: 999,
         fontSize: 12,
         fontWeight: 700,
-        background: active ? "#dbeafe" : "#f1f5f9",
-        color: active ? "#1d4ed8" : "#475569"
+        background: gold ? "#fef3c7" : active ? "#dbeafe" : "#f1f5f9",
+        color: gold ? "#92400e" : active ? "#1d4ed8" : "#475569"
       }}
     >
       {children}
@@ -201,6 +215,7 @@ export default function Home() {
   const [allianceFilter, setAllianceFilter] = useState("All");
   const [programFilter, setProgramFilter] = useState("All");
   const [sortBy, setSortBy] = useState("best");
+  const [cabin, setCabin] = useState("Business");
 
   const fromAirport = parseAirport(fromInput);
   const toAirport = parseAirport(toInput);
@@ -208,7 +223,7 @@ export default function Home() {
   const results = useMemo(() => {
     if (!searched) return [];
 
-    let output = generateMockResults(fromAirport, toAirport, date);
+    let output = generateMockResults(fromAirport, toAirport, date, cabin);
 
     if (allianceFilter !== "All") {
       output = output.filter((r) => r.alliance === allianceFilter);
@@ -225,9 +240,11 @@ export default function Home() {
     });
 
     return output;
-  }, [fromAirport, toAirport, date, searched, allianceFilter, programFilter, sortBy]);
+  }, [fromAirport, toAirport, date, searched, allianceFilter, programFilter, sortBy, cabin]);
 
-  const bestResult = results.length > 0 ? results[0] : null;
+  const bestResult = results.length ? results[0] : null;
+  const lowestCash = results.length ? results.reduce((a, b) => (a.cash < b.cash ? a : b)) : null;
+  const lowestMiles = results.length ? results.reduce((a, b) => (a.miles < b.miles ? a : b)) : null;
 
   return (
     <main
@@ -279,11 +296,11 @@ export default function Home() {
             </h1>
 
             <p style={{ fontSize: 18, lineHeight: 1.6, color: "rgba(255,255,255,0.86)", maxWidth: 680, margin: 0 }}>
-              Compare miles, cash, value per point, and booking options across major loyalty programs in one clean view.
+              Compare miles, cash, cabin class, value per point, and booking options across major loyalty programs.
             </p>
 
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 22 }}>
-              <Pill active>Live-style UI</Pill>
+              <Pill active>Cabin pricing</Pill>
               <Pill active>Value ranking</Pill>
               <Pill active>Program filters</Pill>
             </div>
@@ -304,7 +321,7 @@ export default function Home() {
             <div style={{ marginTop: 16, display: "grid", gap: 16 }}>
               <StatCard label="From" value={fromAirport || "—"} subvalue={fromInput} />
               <StatCard label="To" value={toAirport || "—"} subvalue={toInput} />
-              <StatCard label="Date" value={date || "Select"} subvalue="Choose a travel date to rank options" />
+              <StatCard label="Cabin" value={cabin} subvalue={date || "Select date"} />
             </div>
           </div>
         </section>
@@ -380,10 +397,24 @@ export default function Home() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "1fr 1fr 1fr",
+              gridTemplateColumns: "1fr 1fr 1fr 1fr",
               gap: 14
             }}
           >
+            <div style={{ background: "#f8fafc", border: "1px solid #e5edf8", borderRadius: 16, padding: 16 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#475569", marginBottom: 8 }}>Cabin</div>
+              <select
+                value={cabin}
+                onChange={(e) => setCabin(e.target.value)}
+                style={{ width: "100%", padding: 12, borderRadius: 12, border: "1px solid #dbe3ee", background: "#fff" }}
+              >
+                <option value="Economy">Economy</option>
+                <option value="Premium">Premium</option>
+                <option value="Business">Business</option>
+                <option value="First">First</option>
+              </select>
+            </div>
+
             <div style={{ background: "#f8fafc", border: "1px solid #e5edf8", borderRadius: 16, padding: 16 }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: "#475569", marginBottom: 8 }}>Alliance</div>
               <select
@@ -450,6 +481,7 @@ export default function Home() {
                 </div>
                 <div style={{ marginTop: 8, display: "flex", gap: 8, flexWrap: "wrap" }}>
                   <Pill active>{bestResult.alliance}</Pill>
+                  <Pill>{bestResult.cabin}</Pill>
                   <Pill>{bestResult.duration}</Pill>
                   <Pill>{bestResult.stops === 0 ? "Nonstop" : `${bestResult.stops} stop${bestResult.stops > 1 ? "s" : ""}`}</Pill>
                 </div>
@@ -483,6 +515,7 @@ export default function Home() {
             <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
               <Pill>{fromAirport || "From"}</Pill>
               <Pill>{toAirport || "To"}</Pill>
+              <Pill>{cabin}</Pill>
               <Pill>{date || "No date selected"}</Pill>
             </div>
           </div>
@@ -493,72 +526,80 @@ export default function Home() {
             <div style={{ padding: 28, color: "#64748b" }}>Please choose valid From, To, and Date.</div>
           ) : (
             <div style={{ padding: 16 }}>
-              {results.map((r, idx) => (
-                <div
-                  key={r.program}
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "1.7fr 0.9fr 0.9fr 0.9fr 0.9fr auto",
-                    gap: 12,
-                    alignItems: "center",
-                    padding: 18,
-                    borderRadius: 18,
-                    background: idx === 0 ? "#f8fbff" : "#fff",
-                    border: idx === 0 ? "1px solid #bfdbfe" : "1px solid #eef2f7",
-                    marginBottom: 12
-                  }}
-                >
-                  <div>
-                    <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-                      <div style={{ fontWeight: 800, color: "#0f172a", fontSize: 17 }}>{r.program}</div>
-                      {idx === 0 && <Pill active>Top value</Pill>}
+              {results.map((r, idx) => {
+                const isBest = bestResult && r.program === bestResult.program;
+                const isCheapestCash = lowestCash && r.program === lowestCash.program;
+                const isLowestMiles = lowestMiles && r.program === lowestMiles.program;
+
+                return (
+                  <div
+                    key={r.program}
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1.7fr 0.9fr 0.9fr 0.9fr 0.9fr auto",
+                      gap: 12,
+                      alignItems: "center",
+                      padding: 18,
+                      borderRadius: 18,
+                      background: isBest ? "#f8fbff" : "#fff",
+                      border: isBest ? "1px solid #bfdbfe" : "1px solid #eef2f7",
+                      marginBottom: 12
+                    }}
+                  >
+                    <div>
+                      <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                        <div style={{ fontWeight: 800, color: "#0f172a", fontSize: 17 }}>{r.program}</div>
+                        {isBest && <Pill active>Best value</Pill>}
+                        {isCheapestCash && <Pill gold>Cheapest cash</Pill>}
+                        {isLowestMiles && <Pill>Lowest miles</Pill>}
+                      </div>
+                      <div style={{ fontSize: 13, color: "#64748b", marginTop: 6 }}>
+                        {r.alliance} • {r.cabin} • {r.duration} • {r.stops === 0 ? "Nonstop" : `${r.stops} stop${r.stops > 1 ? "s" : ""}`}
+                      </div>
                     </div>
-                    <div style={{ fontSize: 13, color: "#64748b", marginTop: 6 }}>
-                      {r.alliance} • {r.duration} • {r.stops === 0 ? "Nonstop" : `${r.stops} stop${r.stops > 1 ? "s" : ""}`}
+
+                    <div>
+                      <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>Cash</div>
+                      <div style={{ fontWeight: 800, fontSize: 18, color: "#0f172a" }}>${r.cash}</div>
+                    </div>
+
+                    <div>
+                      <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>Miles</div>
+                      <div style={{ fontWeight: 800, fontSize: 18, color: "#0f172a" }}>{r.miles.toLocaleString()}</div>
+                    </div>
+
+                    <div>
+                      <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>Value</div>
+                      <div style={{ fontWeight: 800, fontSize: 18, color: "#0f172a" }}>{r.cpp}¢/pt</div>
+                    </div>
+
+                    <div>
+                      <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>Rank</div>
+                      <div style={{ fontWeight: 800, fontSize: 18, color: "#0f172a" }}>#{idx + 1}</div>
+                    </div>
+
+                    <div>
+                      <a
+                        href={r.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{
+                          display: "inline-block",
+                          padding: "11px 16px",
+                          borderRadius: 12,
+                          background: "#0f172a",
+                          color: "#fff",
+                          textDecoration: "none",
+                          fontSize: 14,
+                          fontWeight: 800
+                        }}
+                      >
+                        Book
+                      </a>
                     </div>
                   </div>
-
-                  <div>
-                    <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>Cash</div>
-                    <div style={{ fontWeight: 800, fontSize: 18, color: "#0f172a" }}>${r.cash}</div>
-                  </div>
-
-                  <div>
-                    <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>Miles</div>
-                    <div style={{ fontWeight: 800, fontSize: 18, color: "#0f172a" }}>{r.miles.toLocaleString()}</div>
-                  </div>
-
-                  <div>
-                    <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>Value</div>
-                    <div style={{ fontWeight: 800, fontSize: 18, color: "#0f172a" }}>{r.cpp}¢/pt</div>
-                  </div>
-
-                  <div>
-                    <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>Rank</div>
-                    <div style={{ fontWeight: 800, fontSize: 18, color: "#0f172a" }}>#{idx + 1}</div>
-                  </div>
-
-                  <div>
-                    <a
-                      href={r.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      style={{
-                        display: "inline-block",
-                        padding: "11px 16px",
-                        borderRadius: 12,
-                        background: "#0f172a",
-                        color: "#fff",
-                        textDecoration: "none",
-                        fontSize: 14,
-                        fontWeight: 800
-                      }}
-                    >
-                      Book
-                    </a>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </section>
