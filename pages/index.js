@@ -1,792 +1,314 @@
-import { useMemo, useState } from "react";
+export const cities = [
+  // Latin America (100)
+  { city: "Mexico City", airport: "MEX", region: "Latin America" },
+  { city: "Sao Paulo", airport: "GRU", region: "Latin America" },
+  { city: "Buenos Aires", airport: "EZE", region: "Latin America" },
+  { city: "Rio de Janeiro", airport: "GIG", region: "Latin America" },
+  { city: "Lima", airport: "LIM", region: "Latin America" },
+  { city: "Bogota", airport: "BOG", region: "Latin America" },
+  { city: "Santiago", airport: "SCL", region: "Latin America" },
+  { city: "Belo Horizonte", airport: "CNF", region: "Latin America" },
+  { city: "Guadalajara", airport: "GDL", region: "Latin America" },
+  { city: "Monterrey", airport: "MTY", region: "Latin America" },
+  { city: "Brasilia", airport: "BSB", region: "Latin America" },
+  { city: "Salvador", airport: "SSA", region: "Latin America" },
+  { city: "Fortaleza", airport: "FOR", region: "Latin America" },
+  { city: "Recife", airport: "REC", region: "Latin America" },
+  { city: "Porto Alegre", airport: "POA", region: "Latin America" },
+  { city: "Curitiba", airport: "CWB", region: "Latin America" },
+  { city: "Manaus", airport: "MAO", region: "Latin America" },
+  { city: "Belem", airport: "BEL", region: "Latin America" },
+  { city: "Goiania", airport: "GYN", region: "Latin America" },
+  { city: "Campinas", airport: "VCP", region: "Latin America" },
+  { city: "Asuncion", airport: "ASU", region: "Latin America" },
+  { city: "Quito", airport: "UIO", region: "Latin America" },
+  { city: "Guayaquil", airport: "GYE", region: "Latin America" },
+  { city: "La Paz", airport: "LPB", region: "Latin America" },
+  { city: "Santa Cruz", airport: "VVI", region: "Latin America" },
+  { city: "Medellin", airport: "MDE", region: "Latin America" },
+  { city: "Cali", airport: "CLO", region: "Latin America" },
+  { city: "Cartagena", airport: "CTG", region: "Latin America" },
+  { city: "Barranquilla", airport: "BAQ", region: "Latin America" },
+  { city: "Bucaramanga", airport: "BGA", region: "Latin America" },
+  { city: "Pereira", airport: "PEI", region: "Latin America" },
+  { city: "Cucuta", airport: "CUC", region: "Latin America" },
+  { city: "Santa Marta", airport: "SMR", region: "Latin America" },
+  { city: "Panama City", airport: "PTY", region: "Latin America" },
+  { city: "San Jose", airport: "SJO", region: "Latin America" },
+  { city: "San Salvador", airport: "SAL", region: "Latin America" },
+  { city: "Guatemala City", airport: "GUA", region: "Latin America" },
+  { city: "Tegucigalpa", airport: "XPL", region: "Latin America" },
+  { city: "Managua", airport: "MGA", region: "Latin America" },
+  { city: "Santo Domingo", airport: "SDQ", region: "Latin America" },
+  { city: "Punta Cana", airport: "PUJ", region: "Latin America" },
+  { city: "San Juan", airport: "SJU", region: "Latin America" },
+  { city: "Havana", airport: "HAV", region: "Latin America" },
+  { city: "Montevideo", airport: "MVD", region: "Latin America" },
+  { city: "Cordoba", airport: "COR", region: "Latin America" },
+  { city: "Rosario", airport: "ROS", region: "Latin America" },
+  { city: "Mendoza", airport: "MDZ", region: "Latin America" },
+  { city: "Mar del Plata", airport: "MDQ", region: "Latin America" },
+  { city: "San Miguel de Tucuman", airport: "TUC", region: "Latin America" },
+  { city: "La Plata", airport: "EZE", region: "Latin America" },
+  { city: "Tijuana", airport: "TIJ", region: "Latin America" },
+  { city: "Puebla", airport: "PBC", region: "Latin America" },
+  { city: "Leon", airport: "BJX", region: "Latin America" },
+  { city: "Merida", airport: "MID", region: "Latin America" },
+  { city: "Cancun", airport: "CUN", region: "Latin America" },
+  { city: "Queretaro", airport: "QRO", region: "Latin America" },
+  { city: "San Luis Potosi", airport: "SLP", region: "Latin America" },
+  { city: "Aguascalientes", airport: "AGU", region: "Latin America" },
+  { city: "Veracruz", airport: "VER", region: "Latin America" },
+  { city: "Oaxaca", airport: "OAX", region: "Latin America" },
+  { city: "Puerto Vallarta", airport: "PVR", region: "Latin America" },
+  { city: "Acapulco", airport: "ACA", region: "Latin America" },
+  { city: "Toluca", airport: "TLC", region: "Latin America" },
+  { city: "Natal", airport: "NAT", region: "Latin America" },
+  { city: "Maceio", airport: "MCZ", region: "Latin America" },
+  { city: "Joao Pessoa", airport: "JPA", region: "Latin America" },
+  { city: "Aracaju", airport: "AJU", region: "Latin America" },
+  { city: "Cuiaba", airport: "CGB", region: "Latin America" },
+  { city: "Campo Grande", airport: "CGR", region: "Latin America" },
+  { city: "Florianopolis", airport: "FLN", region: "Latin America" },
+  { city: "Vitoria", airport: "VIX", region: "Latin America" },
+  { city: "Sao Luis", airport: "SLZ", region: "Latin America" },
+  { city: "Teresina", airport: "THE", region: "Latin America" },
+  { city: "Porto Velho", airport: "PVH", region: "Latin America" },
+  { city: "Boa Vista", airport: "BVB", region: "Latin America" },
+  { city: "Macapa", airport: "MCP", region: "Latin America" },
+  { city: "Palmas", airport: "PMW", region: "Latin America" },
+  { city: "Arequipa", airport: "AQP", region: "Latin America" },
+  { city: "Cusco", airport: "CUZ", region: "Latin America" },
+  { city: "Trujillo", airport: "TRU", region: "Latin America" },
+  { city: "Piura", airport: "PIU", region: "Latin America" },
+  { city: "Chiclayo", airport: "CIX", region: "Latin America" },
+  { city: "Iquitos", airport: "IQT", region: "Latin America" },
+  { city: "Valparaiso", airport: "SCL", region: "Latin America" },
+  { city: "Concepcion", airport: "CCP", region: "Latin America" },
+  { city: "Antofagasta", airport: "ANF", region: "Latin America" },
+  { city: "Puerto Montt", airport: "PMC", region: "Latin America" },
+  { city: "Temuco", airport: "ZCO", region: "Latin America" },
+  { city: "Maracaibo", airport: "MAR", region: "Latin America" },
+  { city: "Caracas", airport: "CCS", region: "Latin America" },
+  { city: "Valencia", airport: "VLN", region: "Latin America" },
+  { city: "Barquisimeto", airport: "BRM", region: "Latin America" },
+  { city: "Maturin", airport: "MUN", region: "Latin America" },
+  { city: "Paramaribo", airport: "PBM", region: "Latin America" },
+  { city: "Georgetown", airport: "GEO", region: "Latin America" },
+  { city: "Curacao", airport: "CUR", region: "Latin America" },
+  { city: "Aruba", airport: "AUA", region: "Latin America" },
+  { city: "Cochabamba", airport: "CBB", region: "Latin America" },
+  { city: "Sucre", airport: "SRE", region: "Latin America" },
 
-const cities = [
-  { city: "Medellin", airport: "MDE" },
-  { city: "Bogota", airport: "BOG" },
-  { city: "Cartagena", airport: "CTG" },
-  { city: "Cali", airport: "CLO" },
-  { city: "Mexico City", airport: "MEX" },
-  { city: "Lima", airport: "LIM" },
-  { city: "Santiago", airport: "SCL" },
-  { city: "Buenos Aires", airport: "EZE" },
-  { city: "Sao Paulo", airport: "GRU" },
-  { city: "Miami", airport: "MIA" },
-  { city: "Houston", airport: "IAH" },
-  { city: "New York", airport: "JFK" },
-  { city: "Dallas", airport: "DFW" },
-  { city: "Madrid", airport: "MAD" },
-  { city: "Paris", airport: "CDG" },
-  { city: "Amsterdam", airport: "AMS" },
-  { city: "London", airport: "LHR" },
-  { city: "Frankfurt", airport: "FRA" },
-  { city: "Rome", airport: "FCO" },
-  { city: "Lisbon", airport: "LIS" },
-  { city: "Dubai", airport: "DXB" },
-  { city: "Doha", airport: "DOH" }
+  // United States (50)
+  { city: "New York", airport: "JFK", region: "United States" },
+  { city: "Los Angeles", airport: "LAX", region: "United States" },
+  { city: "Chicago", airport: "ORD", region: "United States" },
+  { city: "Houston", airport: "IAH", region: "United States" },
+  { city: "Phoenix", airport: "PHX", region: "United States" },
+  { city: "Philadelphia", airport: "PHL", region: "United States" },
+  { city: "San Antonio", airport: "SAT", region: "United States" },
+  { city: "San Diego", airport: "SAN", region: "United States" },
+  { city: "Dallas", airport: "DFW", region: "United States" },
+  { city: "Fort Worth", airport: "DFW", region: "United States" },
+  { city: "Jacksonville", airport: "JAX", region: "United States" },
+  { city: "Austin", airport: "AUS", region: "United States" },
+  { city: "San Jose", airport: "SJC", region: "United States" },
+  { city: "Charlotte", airport: "CLT", region: "United States" },
+  { city: "Columbus", airport: "CMH", region: "United States" },
+  { city: "Indianapolis", airport: "IND", region: "United States" },
+  { city: "San Francisco", airport: "SFO", region: "United States" },
+  { city: "Seattle", airport: "SEA", region: "United States" },
+  { city: "Denver", airport: "DEN", region: "United States" },
+  { city: "Washington", airport: "IAD", region: "United States" },
+  { city: "Boston", airport: "BOS", region: "United States" },
+  { city: "El Paso", airport: "ELP", region: "United States" },
+  { city: "Nashville", airport: "BNA", region: "United States" },
+  { city: "Detroit", airport: "DTW", region: "United States" },
+  { city: "Oklahoma City", airport: "OKC", region: "United States" },
+  { city: "Portland", airport: "PDX", region: "United States" },
+  { city: "Las Vegas", airport: "LAS", region: "United States" },
+  { city: "Memphis", airport: "MEM", region: "United States" },
+  { city: "Louisville", airport: "SDF", region: "United States" },
+  { city: "Baltimore", airport: "BWI", region: "United States" },
+  { city: "Milwaukee", airport: "MKE", region: "United States" },
+  { city: "Albuquerque", airport: "ABQ", region: "United States" },
+  { city: "Tucson", airport: "TUS", region: "United States" },
+  { city: "Fresno", airport: "FAT", region: "United States" },
+  { city: "Sacramento", airport: "SMF", region: "United States" },
+  { city: "Mesa", airport: "PHX", region: "United States" },
+  { city: "Kansas City", airport: "MCI", region: "United States" },
+  { city: "Atlanta", airport: "ATL", region: "United States" },
+  { city: "Long Beach", airport: "LGB", region: "United States" },
+  { city: "Colorado Springs", airport: "COS", region: "United States" },
+  { city: "Raleigh", airport: "RDU", region: "United States" },
+  { city: "Miami", airport: "MIA", region: "United States" },
+  { city: "Virginia Beach", airport: "ORF", region: "United States" },
+  { city: "Omaha", airport: "OMA", region: "United States" },
+  { city: "Oakland", airport: "OAK", region: "United States" },
+  { city: "Minneapolis", airport: "MSP", region: "United States" },
+  { city: "Tulsa", airport: "TUL", region: "United States" },
+  { city: "Arlington", airport: "DFW", region: "United States" },
+  { city: "New Orleans", airport: "MSY", region: "United States" },
+  { city: "Wichita", airport: "ICT", region: "United States" },
+
+  // Europe (50)
+  { city: "Istanbul", airport: "IST", region: "Europe" },
+  { city: "Moscow", airport: "SVO", region: "Europe" },
+  { city: "London", airport: "LHR", region: "Europe" },
+  { city: "Saint Petersburg", airport: "LED", region: "Europe" },
+  { city: "Berlin", airport: "BER", region: "Europe" },
+  { city: "Madrid", airport: "MAD", region: "Europe" },
+  { city: "Kyiv", airport: "KBP", region: "Europe" },
+  { city: "Rome", airport: "FCO", region: "Europe" },
+  { city: "Paris", airport: "CDG", region: "Europe" },
+  { city: "Bucharest", airport: "OTP", region: "Europe" },
+  { city: "Vienna", airport: "VIE", region: "Europe" },
+  { city: "Minsk", airport: "MSQ", region: "Europe" },
+  { city: "Hamburg", airport: "HAM", region: "Europe" },
+  { city: "Warsaw", airport: "WAW", region: "Europe" },
+  { city: "Budapest", airport: "BUD", region: "Europe" },
+  { city: "Barcelona", airport: "BCN", region: "Europe" },
+  { city: "Munich", airport: "MUC", region: "Europe" },
+  { city: "Kharkiv", airport: "HRK", region: "Europe" },
+  { city: "Milan", airport: "MXP", region: "Europe" },
+  { city: "Prague", airport: "PRG", region: "Europe" },
+  { city: "Sofia", airport: "SOF", region: "Europe" },
+  { city: "Brussels", airport: "BRU", region: "Europe" },
+  { city: "Birmingham", airport: "BHX", region: "Europe" },
+  { city: "Cologne", airport: "CGN", region: "Europe" },
+  { city: "Naples", airport: "NAP", region: "Europe" },
+  { city: "Turin", airport: "TRN", region: "Europe" },
+  { city: "Stockholm", airport: "ARN", region: "Europe" },
+  { city: "Amsterdam", airport: "AMS", region: "Europe" },
+  { city: "Marseille", airport: "MRS", region: "Europe" },
+  { city: "Valencia", airport: "VLC", region: "Europe" },
+  { city: "Leeds", airport: "LBA", region: "Europe" },
+  { city: "Krakow", airport: "KRK", region: "Europe" },
+  { city: "Frankfurt", airport: "FRA", region: "Europe" },
+  { city: "Rotterdam", airport: "AMS", region: "Europe" },
+  { city: "Seville", airport: "SVQ", region: "Europe" },
+  { city: "Lisbon", airport: "LIS", region: "Europe" },
+  { city: "Zagreb", airport: "ZAG", region: "Europe" },
+  { city: "Athens", airport: "ATH", region: "Europe" },
+  { city: "Copenhagen", airport: "CPH", region: "Europe" },
+  { city: "Dublin", airport: "DUB", region: "Europe" },
+  { city: "Oslo", airport: "OSL", region: "Europe" },
+  { city: "Helsinki", airport: "HEL", region: "Europe" },
+  { city: "Edinburgh", airport: "EDI", region: "Europe" },
+  { city: "Geneva", airport: "GVA", region: "Europe" },
+  { city: "Zurich", airport: "ZRH", region: "Europe" },
+  { city: "Porto", airport: "OPO", region: "Europe" },
+  { city: "Lyon", airport: "LYS", region: "Europe" },
+  { city: "Nice", airport: "NCE", region: "Europe" },
+  { city: "Manchester", airport: "MAN", region: "Europe" },
+  { city: "Palma de Mallorca", airport: "PMI", region: "Europe" },
+
+  // Asia (50)
+  { city: "Tokyo", airport: "HND", region: "Asia" },
+  { city: "Delhi", airport: "DEL", region: "Asia" },
+  { city: "Shanghai", airport: "PVG", region: "Asia" },
+  { city: "Dhaka", airport: "DAC", region: "Asia" },
+  { city: "Beijing", airport: "PEK", region: "Asia" },
+  { city: "Mumbai", airport: "BOM", region: "Asia" },
+  { city: "Osaka", airport: "KIX", region: "Asia" },
+  { city: "Karachi", airport: "KHI", region: "Asia" },
+  { city: "Chongqing", airport: "CKG", region: "Asia" },
+  { city: "Istanbul", airport: "IST", region: "Asia" },
+  { city: "Kolkata", airport: "CCU", region: "Asia" },
+  { city: "Manila", airport: "MNL", region: "Asia" },
+  { city: "Foshan", airport: "CAN", region: "Asia" }
+  { city: "Tianjin", airport: "TSN", region: "Asia" },
+  { city: "Guangzhou", airport: "CAN", region: "Asia" },
+  { city: "Lahore", airport: "LHE", region: "Asia" },
+  { city: "Bangalore", airport: "BLR", region: "Asia" },
+  { city: "Shenzhen", airport: "SZX", region: "Asia" },
+  { city: "Bangkok", airport: "BKK", region: "Asia" },
+  { city: "Chennai", airport: "MAA", region: "Asia" },
+  { city: "Jakarta", airport: "CGK", region: "Asia" },
+  { city: "Seoul", airport: "ICN", region: "Asia" },
+  { city: "Chengdu", airport: "TFU", region: "Asia" },
+  { city: "Tehran", airport: "IKA", region: "Asia" },
+  { city: "Ho Chi Minh City", airport: "SGN", region: "Asia" },
+  { city: "Wuhan", airport: "WUH", region: "Asia" },
+  { city: "Hong Kong", airport: "HKG", region: "Asia" },
+  { city: "Xi'an", airport: "XIY", region: "Asia" },
+  { city: "Ahmedabad", airport: "AMD", region: "Asia" },
+  { city: "Hyderabad", airport: "HYD", region: "Asia" },
+  { city: "Kuala Lumpur", airport: "KUL", region: "Asia" },
+  { city: "Singapore", airport: "SIN", region: "Asia" },
+  { city: "Riyadh", airport: "RUH", region: "Asia" },
+  { city: "Jeddah", airport: "JED", region: "Asia" },
+  { city: "Taipei", airport: "TPE", region: "Asia" },
+  { city: "Hangzhou", airport: "HGH", region: "Asia" },
+  { city: "Suzhou", airport: "SHA", region: "Asia" },
+  { city: "Nanjing", airport: "NKG", region: "Asia" },
+  { city: "Fukuoka", airport: "FUK", region: "Asia" },
+  { city: "Sapporo", airport: "CTS", region: "Asia" },
+  { city: "Nagoya", airport: "NGO", region: "Asia" },
+  { city: "Phnom Penh", airport: "PNH", region: "Asia" },
+  { city: "Hanoi", airport: "HAN", region: "Asia" },
+  { city: "Da Nang", airport: "DAD", region: "Asia" },
+  { city: "Ulaanbaatar", airport: "UBN", region: "Asia" },
+  { city: "Almaty", airport: "ALA", region: "Asia" },
+  { city: "Tashkent", airport: "TAS", region: "Asia" },
+  { city: "Doha", airport: "DOH", region: "Asia" },
+  { city: "Dubai", airport: "DXB", region: "Asia" },
+  { city: "Abu Dhabi", airport: "AUH", region: "Asia" }
 ];
 
-const airlineInfo = {
-  "Iberia Avios": {
-    name: "Iberia",
-    emoji: "🇪🇸",
-    cashUrl: "https://www.iberia.com/",
-    pointsUrl: "https://www.iberia.com/"
-  },
-  "Flying Blue": {
-    name: "Air France / KLM",
-    emoji: "🇫🇷",
-    cashUrl: "https://www.airfrance.com/",
-    pointsUrl: "https://www.flyingblue.com/"
-  },
-  "LifeMiles": {
-    name: "Avianca LifeMiles",
-    emoji: "✈️",
-    cashUrl: "https://www.avianca.com/",
-    pointsUrl: "https://www.lifemiles.com/"
-  },
-  "AAdvantage": {
-    name: "American Airlines",
-    emoji: "🇺🇸",
-    cashUrl: "https://www.aa.com/",
-    pointsUrl: "https://www.aa.com/"
-  },
-  "United": {
-    name: "United Airlines",
-    emoji: "🇺🇸",
-    cashUrl: "https://www.united.com/",
-    pointsUrl: "https://www.united.com/"
-  }
-};
-
-const routeTemplates = [
-  { program: "Iberia Avios", origin: "BOG", destination: "MAD", cabin: "Business", baseMiles: 42500, baseTaxes: 120, baseCash: 2200 },
-  { program: "Flying Blue", origin: "BOG", destination: "CDG", cabin: "Business", baseMiles: 55000, baseTaxes: 210, baseCash: 2400 },
-  { program: "LifeMiles", origin: "MDE", destination: "MAD", cabin: "Business", baseMiles: 63000, baseTaxes: 78, baseCash: 2100 },
-  { program: "Flying Blue", origin: "MDE", destination: "AMS", cabin: "Business", baseMiles: 59000, baseTaxes: 195, baseCash: 2350 },
-  { program: "Iberia Avios", origin: "MEX", destination: "MAD", cabin: "Business", baseMiles: 51000, baseTaxes: 150, baseCash: 2400 },
-  { program: "Flying Blue", origin: "GRU", destination: "CDG", cabin: "Business", baseMiles: 55000, baseTaxes: 250, baseCash: 2700 },
-  { program: "LifeMiles", origin: "LIM", destination: "MAD", cabin: "Business", baseMiles: 65000, baseTaxes: 85, baseCash: 2300 },
-  { program: "AAdvantage", origin: "BOG", destination: "MIA", cabin: "Business", baseMiles: 30000, baseTaxes: 80, baseCash: 900 },
-  { program: "United", origin: "MDE", destination: "IAH", cabin: "Business", baseMiles: 35000, baseTaxes: 70, baseCash: 950 },
-  { program: "Flying Blue", origin: "SCL", destination: "CDG", cabin: "Business", baseMiles: 64000, baseTaxes: 240, baseCash: 2600 },
-  { program: "Iberia Avios", origin: "EZE", destination: "MAD", cabin: "Business", baseMiles: 59000, baseTaxes: 170, baseCash: 2550 }
+export const rewardsPrograms = [
+  { name: "American AAdvantage", type: "airline", alliance: "oneworld", transferPartners: ["Bilt", "Marriott"] },
+  { name: "Alaska Mileage Plan", type: "airline", alliance: "oneworld", transferPartners: ["Bilt", "Marriott"] },
+  { name: "United MileagePlus", type: "airline", alliance: "Star Alliance", transferPartners: ["Chase", "Bilt", "Marriott"] },
+  { name: "Delta SkyMiles", type: "airline", alliance: "SkyTeam", transferPartners: ["Amex", "Marriott"] },
+  { name: "Air Canada Aeroplan", type: "airline", alliance: "Star Alliance", transferPartners: ["Amex", "Chase", "Capital One", "Bilt", "Marriott"] },
+  { name: "Air France-KLM Flying Blue", type: "airline", alliance: "SkyTeam", transferPartners: ["Amex", "Chase", "Citi", "Capital One", "Bilt", "Marriott"] },
+  { name: "British Airways Executive Club", type: "airline", alliance: "oneworld", transferPartners: ["Amex", "Chase", "Capital One", "Bilt", "Marriott"] },
+  { name: "Iberia Plus", type: "airline", alliance: "oneworld", transferPartners: ["Amex", "Chase", "Bilt", "Marriott"] },
+  { name: "Qatar Airways Privilege Club", type: "airline", alliance: "oneworld", transferPartners: ["Amex", "Citi", "Capital One", "Bilt", "Marriott"] },
+  { name: "Virgin Atlantic Flying Club", type: "airline", alliance: "SkyTeam", transferPartners: ["Amex", "Chase", "Citi", "Capital One", "Bilt", "Marriott"] },
+  { name: "Singapore KrisFlyer", type: "airline", alliance: "Star Alliance", transferPartners: ["Amex", "Chase", "Citi", "Capital One", "Marriott"] },
+  { name: "Emirates Skywards", type: "airline", alliance: "Independent", transferPartners: ["Amex", "Chase", "Citi", "Capital One", "Bilt", "Marriott"] },
+  { name: "Etihad Guest", type: "airline", alliance: "Independent", transferPartners: ["Amex", "Citi", "Capital One", "Marriott"] },
+  { name: "Turkish Miles&Smiles", type: "airline", alliance: "Star Alliance", transferPartners: ["Citi", "Capital One", "Bilt", "Marriott"] },
+  { name: "Avianca LifeMiles", type: "airline", alliance: "Star Alliance", transferPartners: ["Amex", "Citi", "Capital One", "Bilt", "Marriott"] },
+  { name: "Cathay Pacific Asia Miles", type: "airline", alliance: "oneworld", transferPartners: ["Amex", "Citi", "Capital One", "Bilt", "Marriott"] },
+  { name: "ANA Mileage Club", type: "airline", alliance: "Star Alliance", transferPartners: ["Amex", "Marriott"] },
+  { name: "Qantas Frequent Flyer", type: "airline", alliance: "oneworld", transferPartners: ["Amex", "Capital One", "Citi", "Marriott"] },
+  { name: "TAP Miles&Go", type: "airline", alliance: "Star Alliance", transferPartners: ["Capital One", "Marriott"] },
+  { name: "Southwest Rapid Rewards", type: "airline", alliance: "Independent", transferPartners: ["Chase", "Marriott"] },
+  { name: "JetBlue TrueBlue", type: "airline", alliance: "Independent", transferPartners: ["Chase", "Citi", "Capital One", "Marriott"] },
+  { name: "Hilton Honors", type: "hotel", alliance: "Hotel", transferPartners: ["Amex", "Bilt"] },
+  { name: "Marriott Bonvoy", type: "hotel", alliance: "Hotel", transferPartners: ["Amex", "Chase", "Citi", "Capital One", "Bilt"] },
+  { name: "World of Hyatt", type: "hotel", alliance: "Hotel", transferPartners: ["Chase", "Bilt"] },
+  { name: "IHG One Rewards", type: "hotel", alliance: "Hotel", transferPartners: ["Chase", "Bilt"] }
 ];
 
-function clamp(n, min, max) {
-  return Math.max(min, Math.min(max, n));
-}
-
-function hashString(str) {
-  let h = 0;
-  for (let i = 0; i < str.length; i++) {
-    h = (h * 31 + str.charCodeAt(i)) % 1000000;
-  }
-  return h;
-}
-
-function calcCpp(cashPrice, taxes, miles) {
-  if (!miles) return 0;
-  return ((cashPrice - taxes) / miles) * 100;
-}
-
-function dealLabel(cpp) {
-  if (cpp >= 4.5) return "Excellent Value";
-  if (cpp >= 3.2) return "Good Value";
-  if (cpp >= 2.0) return "Average Value";
-  return "Weak Value";
-}
-
-function dealColor(cpp) {
-  if (cpp >= 4.5) return "#16a34a";
-  if (cpp >= 3.2) return "#2563eb";
-  if (cpp >= 2.0) return "#d97706";
-  return "#dc2626";
-}
-
-function buildResult(route, date) {
-  const seed = hashString(route.origin + route.destination + route.program + route.cabin + date);
-  const milesAdj = 1 + (((seed % 11) - 5) * 0.03);
-  const taxesAdj = 1 + (((seed % 7) - 3) * 0.04);
-  const cashAdj = 1 + (((seed % 13) - 6) * 0.05);
-
-  const miles = Math.round((route.baseMiles * milesAdj) / 500) * 500;
-  const taxes = Math.round(clamp(route.baseTaxes * taxesAdj, 5, 2000));
-  const cashPrice = Math.round(clamp(route.baseCash * cashAdj, 60, 10000));
-  const cpp = calcCpp(cashPrice, taxes, miles);
-
-  const info = airlineInfo[route.program] || {
-    name: route.program,
-    emoji: "✈️",
-    cashUrl: "#",
-    pointsUrl: "#"
-  };
-
-  return {
-    ...route,
-    date,
-    miles,
-    taxes,
-    cashPrice,
-    cpp,
-    valueLabel: dealLabel(cpp),
-    valueColor: dealColor(cpp),
-    airlineName: info.name,
-    airlineEmoji: info.emoji,
-    cashUrl: info.cashUrl,
-    pointsUrl: info.pointsUrl
-  };
-}
-
-function nearbyDates(dateStr) {
-  const base = new Date(dateStr);
-  const out = [];
-
-  for (let i = -3; i <= 3; i++) {
-    const d = new Date(base);
-    d.setDate(d.getDate() + i);
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    out.push(`${y}-${m}-${day}`);
-  }
-
-  return out;
-}
-
-function findAirportCode(input) {
-  const value = input.trim().toLowerCase();
-
-  for (let i = 0; i < cities.length; i++) {
-    const cityMatch = cities[i].city.toLowerCase() === value;
-    const airportMatch = cities[i].airport.toLowerCase() === value;
-    if (cityMatch || airportMatch) return cities[i].airport;
-  }
-
-  return "";
-}
-
-function AutocompleteInput({ label, value, setValue, placeholder }) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const suggestions = useMemo(() => {
-    if (!value.trim()) return cities.slice(0, 8);
-
-    return cities
-      .filter((item) => {
-        const text = value.toLowerCase();
-        return (
-          item.city.toLowerCase().includes(text) ||
-          item.airport.toLowerCase().includes(text)
-        );
-      })
-      .slice(0, 8);
-  }, [value]);
-
-  return (
-    <div style={{ position: "relative" }}>
-      <label style={labelStyle}>{label}</label>
-      <input
-        value={value}
-        onChange={(e) => {
-          setValue(e.target.value);
-          setIsOpen(true);
-        }}
-        onFocus={() => setIsOpen(true)}
-        placeholder={placeholder}
-        style={inputStyle}
-      />
-
-      {isOpen && suggestions.length > 0 ? (
-        <div style={suggestionsBoxStyle}>
-          {suggestions.map((item) => (
-            <button
-              key={item.city + item.airport}
-              type="button"
-              onClick={() => {
-                setValue(item.city);
-                setIsOpen(false);
-              }}
-              style={suggestionButtonStyle}
-            >
-              <div style={suggestionTitleStyle}>{item.city}</div>
-              <div style={suggestionSubtitleStyle}>{item.airport}</div>
-            </button>
-          ))}
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
-function ResultCard({ r }) {
-  return (
-    <div style={cardStyle}>
-      <div style={cardHeaderStyle}>
-        <div>
-          <div
-            style={{
-              ...pillStyle,
-              backgroundColor: r.valueColor
-            }}
-          >
-            {r.valueLabel}
-          </div>
-          <h3 style={routeTitleStyle}>
-            {r.origin} → {r.destination}
-          </h3>
-          <p style={mutedStyle}>{r.date} · {r.cabin}</p>
-        </div>
-
-        <div style={brandBoxStyle}>
-          <div style={brandEmojiStyle}>{r.airlineEmoji}</div>
-          <div style={brandNameStyle}>{r.airlineName}</div>
-        </div>
-      </div>
-
-      <div style={statsGridStyle}>
-        <div style={statBoxStyle}>
-          <div style={smallLabelStyle}>Cash fare</div>
-          <div style={bigValueStyle}>${r.cashPrice}</div>
-        </div>
-
-        <div style={statBoxStyle}>
-          <div style={smallLabelStyle}>Award price</div>
-          <div style={bigValueStyle}>{r.miles.toLocaleString()}</div>
-          <div style={tinyTextStyle}>miles + ${r.taxes}</div>
-        </div>
-
-        <div style={statBoxStyle}>
-          <div style={smallLabelStyle}>CPP</div>
-          <div style={bigValueStyle}>{r.cpp.toFixed(1)}</div>
-        </div>
-
-        <div style={statBoxStyle}>
-          <div style={smallLabelStyle}>Program</div>
-          <div style={programValueStyle}>{r.program}</div>
-        </div>
-      </div>
-
-      <div style={buttonGroupStyle}>
-        <a
-          href={r.cashUrl}
-          target="_blank"
-          rel="noreferrer"
-          style={linkButtonPrimaryStyle}
-        >
-          Book with cash
-        </a>
-
-        <a
-          href={r.pointsUrl}
-          target="_blank"
-          rel="noreferrer"
-          style={linkButtonSecondaryStyle}
-        >
-          Book with points
-        </a>
-      </div>
-    </div>
-  );
-}
-
-export default function Home() {
-  const [originCity, setOriginCity] = useState("Medellin");
-  const [destinationCity, setDestinationCity] = useState("Madrid");
-  const [date, setDate] = useState("2026-06-10");
-  const [cabin, setCabin] = useState("Business");
-  const [searched, setSearched] = useState(false);
-
-  const results = useMemo(() => {
-    const originCode = findAirportCode(originCity);
-    const destinationCode = findAirportCode(destinationCity);
-
-    if (!originCode || !destinationCode || !date) return [];
-
-    const matchingRoutes = routeTemplates.filter((r) => {
-      return (
-        r.origin === originCode &&
-        r.destination === destinationCode &&
-        (cabin === "ALL" || r.cabin === cabin)
-      );
-    });
-
-    if (matchingRoutes.length === 0) return [];
-
-    const datesToShow = nearbyDates(date);
-    const built = [];
-
-    for (let i = 0; i < matchingRoutes.length; i++) {
-      for (let j = 0; j < datesToShow.length; j++) {
-        built.push(buildResult(matchingRoutes[i], datesToShow[j]));
-      }
-    }
-
-    return built.sort((a, b) => b.cpp - a.cpp);
-  }, [originCity, destinationCity, date, cabin]);
-
-  const shownResults = searched ? results : [];
-
-  return (
-    <div style={pageStyle}>
-      <div style={backgroundGlowOne} />
-      <div style={backgroundGlowTwo} />
-
-      <div style={containerStyle}>
-        <div style={heroStyle}>
-          <div style={heroBadgeStyle}>Premium award search demo</div>
-          <h1 style={titleStyle}>Book smarter with points</h1>
-          <p style={subtitleStyle}>
-            Search by city, compare cash versus miles, and jump straight to the airline website.
-          </p>
-        </div>
-
-        <div style={searchCardStyle}>
-          <h2 style={sectionTitleStyle}>Search flights</h2>
-
-          <div style={gridStyle}>
-            <AutocompleteInput
-              label="From"
-              value={originCity}
-              setValue={setOriginCity}
-              placeholder="Type a city or airport"
-            />
-
-            <AutocompleteInput
-              label="To"
-              value={destinationCity}
-              setValue={setDestinationCity}
-              placeholder="Type a city or airport"
-            />
-
-            <div>
-              <label style={labelStyle}>Departure date</label>
-              <input
-                type="date"
-                value={date}
-                min="2026-01-01"
-                max="2026-12-31"
-                onChange={(e) => setDate(e.target.value)}
-                style={inputStyle}
-              />
-            </div>
-
-            <div>
-              <label style={labelStyle}>Cabin</label>
-              <select
-                value={cabin}
-                onChange={(e) => setCabin(e.target.value)}
-                style={inputStyle}
-              >
-                <option value="Business">Business</option>
-                <option value="Economy">Economy</option>
-                <option value="ALL">All cabins</option>
-              </select>
-            </div>
-          </div>
-
-          <div style={buttonRowStyle}>
-            <button onClick={() => setSearched(true)} style={primaryButtonStyle}>
-              Find awards
-            </button>
-
-            <button
-              onClick={() => {
-                setOriginCity("Medellin");
-                setDestinationCity("Madrid");
-                setDate("2026-06-10");
-                setCabin("Business");
-                setSearched(false);
-              }}
-              style={secondaryButtonStyle}
-            >
-              Reset
-            </button>
-          </div>
-        </div>
-
-        {searched ? (
-          shownResults.length === 0 ? (
-            <div style={emptyStyle}>
-              <h3 style={{ marginTop: 0, marginBottom: 8 }}>No sample routes found</h3>
-              <p style={{ margin: 0, color: "#5f6b7a" }}>
-                Try Medellin → Madrid, Bogota → Madrid, Bogota → Paris, Mexico City → Madrid, Sao Paulo → Paris, Lima → Madrid, or Bogota → Miami.
-              </p>
-            </div>
-          ) : (
-            <>
-              <div style={resultsHeaderStyle}>
-                <div>
-                  <h2 style={sectionTitleStyle}>Results</h2>
-                  <p style={resultsSubtextStyle}>
-                    Showing the selected date plus nearby dates.
-                  </p>
-                </div>
-                <div style={resultsCountStyle}>{shownResults.length} options</div>
-              </div>
-
-              <div style={resultsGridStyle}>
-                {shownResults.map((r, i) => (
-                  <ResultCard key={i} r={r} />
-                ))}
-              </div>
-            </>
-          )
-        ) : (
-          <div style={emptyStyle}>
-            <p style={{ margin: 0, color: "#5f6b7a" }}>
-              Start typing a city name, choose a date, and click <strong>Find awards</strong>.
-            </p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-const pageStyle = {
-  position: "relative",
-  overflow: "hidden",
-  fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-  background: "linear-gradient(180deg, #f8fbff 0%, #eef4ff 100%)",
-  minHeight: "100vh",
-  padding: "40px 18px"
-};
-
-const backgroundGlowOne = {
-  position: "absolute",
-  top: "-120px",
-  right: "-80px",
-  width: "340px",
-  height: "340px",
-  borderRadius: "999px",
-  background: "rgba(96, 165, 250, 0.18)",
-  filter: "blur(60px)"
-};
-
-const backgroundGlowTwo = {
-  position: "absolute",
-  bottom: "-120px",
-  left: "-80px",
-  width: "320px",
-  height: "320px",
-  borderRadius: "999px",
-  background: "rgba(167, 139, 250, 0.16)",
-  filter: "blur(60px)"
-};
-
-const containerStyle = {
-  position: "relative",
-  zIndex: 1,
-  maxWidth: "1140px",
-  margin: "0 auto"
-};
-
-const heroStyle = {
-  marginBottom: "28px"
-};
-
-const heroBadgeStyle = {
-  display: "inline-block",
-  padding: "8px 12px",
-  borderRadius: "999px",
-  background: "rgba(255,255,255,0.75)",
-  border: "1px solid rgba(148,163,184,0.2)",
-  color: "#31507a",
-  fontSize: "13px",
-  fontWeight: 600,
-  marginBottom: "14px",
-  backdropFilter: "blur(10px)"
-};
-
-const titleStyle = {
-  fontSize: "52px",
-  lineHeight: 1.02,
-  letterSpacing: "-0.04em",
-  marginBottom: "12px",
-  color: "#0f172a",
-  maxWidth: "800px"
-};
-
-const subtitleStyle = {
-  color: "#475569",
-  fontSize: "18px",
-  lineHeight: 1.6,
-  marginTop: 0,
-  maxWidth: "760px"
-};
-
-const searchCardStyle = {
-  background: "rgba(255,255,255,0.8)",
-  backdropFilter: "blur(16px)",
-  borderRadius: "28px",
-  padding: "26px",
-  border: "1px solid rgba(148,163,184,0.18)",
-  boxShadow: "0 20px 50px rgba(15, 23, 42, 0.08)",
-  marginBottom: "28px"
-};
-
-const sectionTitleStyle = {
-  marginTop: 0,
-  marginBottom: 16,
-  fontSize: "24px",
-  color: "#0f172a",
-  letterSpacing: "-0.02em"
-};
-
-const gridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-  gap: "14px"
-};
-
-const labelStyle = {
-  display: "block",
-  fontSize: "13px",
-  fontWeight: 600,
-  color: "#475569",
-  marginBottom: "8px"
-};
-
-const inputStyle = {
-  width: "100%",
-  boxSizing: "border-box",
-  padding: "14px 16px",
-  borderRadius: "16px",
-  border: "1px solid #dbe4f0",
-  fontSize: "15px",
-  color: "#0f172a",
-  backgroundColor: "#ffffff",
-  outline: "none",
-  boxShadow: "inset 0 1px 2px rgba(15,23,42,0.03)"
-};
-
-const suggestionsBoxStyle = {
-  position: "absolute",
-  top: "100%",
-  left: 0,
-  right: 0,
-  backgroundColor: "rgba(255,255,255,0.96)",
-  border: "1px solid #dbe4f0",
-  borderRadius: "16px",
-  marginTop: "8px",
-  boxShadow: "0 18px 40px rgba(15,23,42,0.12)",
-  overflow: "hidden",
-  zIndex: 20,
-  backdropFilter: "blur(12px)"
-};
-
-const suggestionButtonStyle = {
-  display: "block",
-  width: "100%",
-  textAlign: "left",
-  padding: "13px 14px",
-  border: "none",
-  backgroundColor: "white",
-  cursor: "pointer"
-};
-
-const suggestionTitleStyle = {
-  fontWeight: 700,
-  color: "#0f172a",
-  fontSize: "14px"
-};
-
-const suggestionSubtitleStyle = {
-  fontSize: "12px",
-  color: "#64748b",
-  marginTop: "2px"
-};
-
-const buttonRowStyle = {
-  display: "flex",
-  gap: 10,
-  marginTop: 20,
-  flexWrap: "wrap"
-};
-
-const primaryButtonStyle = {
-  padding: "14px 20px",
-  background: "linear-gradient(135deg, #2563eb 0%, #4f46e5 100%)",
-  color: "white",
-  border: "none",
-  borderRadius: "16px",
-  cursor: "pointer",
-  fontSize: "15px",
-  fontWeight: 700,
-  boxShadow: "0 12px 24px rgba(79,70,229,0.22)"
-};
-
-const secondaryButtonStyle = {
-  padding: "14px 20px",
-  backgroundColor: "rgba(255,255,255,0.9)",
-  color: "#111",
-  border: "1px solid #dbe4f0",
-  borderRadius: "16px",
-  cursor: "pointer",
-  fontSize: "15px",
-  fontWeight: 600
-};
-
-const emptyStyle = {
-  background: "rgba(255,255,255,0.84)",
-  backdropFilter: "blur(14px)",
-  padding: "26px",
-  borderRadius: "24px",
-  border: "1px solid rgba(148,163,184,0.16)",
-  boxShadow: "0 18px 40px rgba(15,23,42,0.08)"
-};
-
-const resultsHeaderStyle = {
-  display: "flex",
-  alignItems: "end",
-  justifyContent: "space-between",
-  gap: "12px",
-  marginBottom: "18px",
-  flexWrap: "wrap"
-};
-
-const resultsSubtextStyle = {
-  marginTop: 0,
-  color: "#64748b"
-};
-
-const resultsCountStyle = {
-  padding: "10px 14px",
-  borderRadius: "999px",
-  background: "rgba(255,255,255,0.85)",
-  border: "1px solid rgba(148,163,184,0.18)",
-  color: "#334155",
-  fontWeight: 700
-};
-
-const resultsGridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))",
-  gap: "18px"
-};
-
-const cardStyle = {
-  background: "rgba(255,255,255,0.9)",
-  backdropFilter: "blur(12px)",
-  borderRadius: "26px",
-  padding: "22px",
-  border: "1px solid rgba(148,163,184,0.16)",
-  boxShadow: "0 18px 40px rgba(15,23,42,0.08)"
-};
-
-const cardHeaderStyle = {
-  display: "flex",
-  justifyContent: "space-between",
-  gap: "14px",
-  alignItems: "flex-start",
-  marginBottom: "16px"
-};
-
-const pillStyle = {
-  display: "inline-block",
-  padding: "7px 12px",
-  color: "white",
-  borderRadius: "999px",
-  fontSize: "12px",
-  fontWeight: 700,
-  marginBottom: "12px"
-};
-
-const routeTitleStyle = {
-  marginTop: 0,
-  marginBottom: 8,
-  fontSize: "24px",
-  color: "#0f172a",
-  letterSpacing: "-0.02em"
-};
-
-const mutedStyle = {
-  color: "#64748b",
-  marginTop: 0,
-  marginBottom: "0"
-};
-
-const brandBoxStyle = {
-  minWidth: "92px",
-  textAlign: "right"
-};
-
-const brandEmojiStyle = {
-  fontSize: "24px",
-  marginBottom: "6px"
-};
-
-const brandNameStyle = {
-  fontSize: "13px",
-  color: "#475569",
-  fontWeight: 700
-};
-
-const statsGridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-  gap: "12px",
-  marginBottom: "18px"
-};
-
-const statBoxStyle = {
-  background: "linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)",
-  borderRadius: "18px",
-  padding: "14px",
-  border: "1px solid #e5edf7"
-};
-
-const smallLabelStyle = {
-  fontSize: "12px",
-  color: "#64748b",
-  marginBottom: "5px",
-  fontWeight: 600
-};
-
-const bigValueStyle = {
-  fontSize: "22px",
-  fontWeight: 800,
-  color: "#0f172a",
-  letterSpacing: "-0.02em"
-};
-
-const tinyTextStyle = {
-  fontSize: "12px",
-  color: "#64748b",
-  marginTop: "4px"
-};
-
-const programValueStyle = {
-  fontSize: "16px",
-  fontWeight: 700,
-  color: "#0f172a"
-};
-
-const buttonGroupStyle = {
-  display: "flex",
-  gap: "10px",
-  flexWrap: "wrap"
-};
-
-const linkButtonPrimaryStyle = {
-  display: "inline-block",
-  padding: "12px 16px",
-  borderRadius: "14px",
-  textDecoration: "none",
-  background: "linear-gradient(135deg, #2563eb 0%, #4f46e5 100%)",
-  color: "white",
-  fontWeight: 700,
-  fontSize: "14px"
-};
-
-const linkButtonSecondaryStyle = {
-  display: "inline-block",
-  padding: "12px 16px",
-  borderRadius: "14px",
-  textDecoration: "none",
-  background: "#ffffff",
-  color: "#0f172a",
-  border: "1px solid #dbe4f0",
-  fontWeight: 700,
-  fontSize: "14px"
-};
+export const airlineInfo = {
+  "American AAdvantage": { name: "American Airlines", emoji: "🇺🇸", cashUrl: "https://www.aa.com/", pointsUrl: "https://www.aa.com/" },
+  "Alaska Mileage Plan": { name: "Alaska Airlines", emoji: "🇺🇸", cashUrl: "https://www.alaskaair.com/", pointsUrl: "https://www.alaskaair.com/" },
+  "United MileagePlus": { name: "United Airlines", emoji: "🇺🇸", cashUrl: "https://www.united.com/", pointsUrl: "https://www.united.com/" },
+  "Delta SkyMiles": { name: "Delta Air Lines", emoji: "🇺🇸", cashUrl: "https://www.delta.com/", pointsUrl: "https://www.delta.com/" },
+  "Air Canada Aeroplan": { name: "Air Canada", emoji: "🇨🇦", cashUrl: "https://www.aircanada.com/", pointsUrl: "https://www.aircanada.com/" },
+  "Air France-KLM Flying Blue": { name: "Air France / KLM", emoji: "🇫🇷", cashUrl: "https://www.flyingblue.com/", pointsUrl: "https://www.flyingblue.com/" },
+  "British Airways Executive Club": { name: "British Airways", emoji: "🇬🇧", cashUrl: "https://www.britishairways.com/", pointsUrl: "https://www.britishairways.com/" },
+  "Iberia Plus": { name: "Iberia", emoji: "🇪🇸", cashUrl: "https://www.iberia.com/", pointsUrl: "https://www.iberia.com/" },
+  "Qatar Airways Privilege Club": { name: "Qatar Airways", emoji: "🇶🇦", cashUrl: "https://www.qatarairways.com/", pointsUrl: "https://www.qatarairways.com/" },
+  "Virgin Atlantic Flying Club": { name: "Virgin Atlantic", emoji: "🇬🇧", cashUrl: "https://www.virginatlantic.com/", pointsUrl: "https://www.virginatlantic.com/" },
+  "Singapore KrisFlyer": { name: "Singapore Airlines", emoji: "🇸🇬", cashUrl: "https://www.singaporeair.com/", pointsUrl: "https://www.singaporeair.com/" },
+  "Emirates Skywards": { name: "Emirates", emoji: "🇦🇪", cashUrl: "https://www.emirates.com/", pointsUrl: "https://www.emirates.com/" },
+  "Etihad Guest": { name: "Etihad Airways", emoji: "🇦🇪", cashUrl: "https://www.etihad.com/", pointsUrl: "https://www.etihad.com/" },
+  "Turkish Miles&Smiles": { name: "Turkish Airlines", emoji: "🇹🇷", cashUrl: "https://www.turkishairlines.com/", pointsUrl: "https://www.turkishairlines.com/" },
+  "Avianca LifeMiles": { name: "Avianca", emoji: "🇨🇴", cashUrl: "https://www.avianca.com/", pointsUrl: "https://www.lifemiles.com/" },
+  "Cathay Pacific Asia Miles": { name: "Cathay Pacific", emoji: "🇭🇰", cashUrl: "https://www.cathaypacific.com/", pointsUrl: "https://www.cathaypacific.com/" },
+  "ANA Mileage Club": { name: "ANA", emoji: "🇯🇵", cashUrl: "https://www.ana.co.jp/", pointsUrl: "https://www.ana.co.jp/" },
+  "Qantas Frequent Flyer": { name: "Qantas", emoji: "🇦🇺", cashUrl: "https://www.qantas.com/", pointsUrl: "https://www.qantas.com/" },
+  "TAP Miles&Go": { name: "TAP Air Portugal", emoji: "🇵🇹", cashUrl: "https://www.flytap.com/", pointsUrl: "https://www.flytap.com/" },
+  "Southwest Rapid Rewards": { name: "Southwest", emoji: "🇺🇸", cashUrl: "https://www.southwest.com/", pointsUrl: "https://www.southwest.com/" },
+  "JetBlue TrueBlue": { name: "JetBlue", emoji: "🇺🇸", cashUrl: "https://www.jetblue.com/", pointsUrl: "https://www.jetblue.com/" },
+  "Hilton Honors": { name: "Hilton", emoji: "🏨", cashUrl: "https://www.hilton.com/", pointsUrl: "https://www.hilton.com/" },
+  "Marriott Bonvoy": { name: "Marriott", emoji: "🏨", cashUrl: "https://www.marriott.com/", pointsUrl: "https://www.marriott.com/" },
+  "World of Hyatt": { name: "Hyatt", emoji: "🏨", cashUrl: "https://world.hyatt.com/", pointsUrl: "https://world.hyatt.com/" },
+  "IHG One Rewards": { name: "IHG", emoji: "🏨", cashUrl: "https://www.ihg.com/", pointsUrl: "https://www.ihg.com/" }
+} as const;
