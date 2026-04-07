@@ -25,6 +25,39 @@ const cities = [
   { city: "Doha", airport: "DOH" }
 ];
 
+const airlineInfo = {
+  "Iberia Avios": {
+    name: "Iberia",
+    emoji: "🇪🇸",
+    cashUrl: "https://www.iberia.com/",
+    pointsUrl: "https://www.iberia.com/"
+  },
+  "Flying Blue": {
+    name: "Air France / KLM",
+    emoji: "🇫🇷",
+    cashUrl: "https://www.airfrance.com/",
+    pointsUrl: "https://www.flyingblue.com/"
+  },
+  "LifeMiles": {
+    name: "Avianca LifeMiles",
+    emoji: "✈️",
+    cashUrl: "https://www.avianca.com/",
+    pointsUrl: "https://www.lifemiles.com/"
+  },
+  "AAdvantage": {
+    name: "American Airlines",
+    emoji: "🇺🇸",
+    cashUrl: "https://www.aa.com/",
+    pointsUrl: "https://www.aa.com/"
+  },
+  "United": {
+    name: "United Airlines",
+    emoji: "🇺🇸",
+    cashUrl: "https://www.united.com/",
+    pointsUrl: "https://www.united.com/"
+  }
+};
+
 const routeTemplates = [
   { program: "Iberia Avios", origin: "BOG", destination: "MAD", cabin: "Business", baseMiles: 42500, baseTaxes: 120, baseCash: 2200 },
   { program: "Flying Blue", origin: "BOG", destination: "CDG", cabin: "Business", baseMiles: 55000, baseTaxes: 210, baseCash: 2400 },
@@ -57,10 +90,17 @@ function calcCpp(cashPrice, taxes, miles) {
 }
 
 function dealLabel(cpp) {
-  if (cpp >= 4.5) return "Excellent";
-  if (cpp >= 3.2) return "Good";
-  if (cpp >= 2.0) return "Average";
-  return "Weak";
+  if (cpp >= 4.5) return "Excellent Value";
+  if (cpp >= 3.2) return "Good Value";
+  if (cpp >= 2.0) return "Average Value";
+  return "Weak Value";
+}
+
+function dealColor(cpp) {
+  if (cpp >= 4.5) return "#16a34a";
+  if (cpp >= 3.2) return "#2563eb";
+  if (cpp >= 2.0) return "#d97706";
+  return "#dc2626";
 }
 
 function buildResult(route, date) {
@@ -74,6 +114,13 @@ function buildResult(route, date) {
   const cashPrice = Math.round(clamp(route.baseCash * cashAdj, 60, 10000));
   const cpp = calcCpp(cashPrice, taxes, miles);
 
+  const info = airlineInfo[route.program] || {
+    name: route.program,
+    emoji: "✈️",
+    cashUrl: "#",
+    pointsUrl: "#"
+  };
+
   return {
     ...route,
     date,
@@ -81,7 +128,12 @@ function buildResult(route, date) {
     taxes,
     cashPrice,
     cpp,
-    valueLabel: dealLabel(cpp)
+    valueLabel: dealLabel(cpp),
+    valueColor: dealColor(cpp),
+    airlineName: info.name,
+    airlineEmoji: info.emoji,
+    cashUrl: info.cashUrl,
+    pointsUrl: info.pointsUrl
   };
 }
 
@@ -113,24 +165,21 @@ function findAirportCode(input) {
   return "";
 }
 
-function AutocompleteInput({
-  label,
-  value,
-  setValue,
-  placeholder
-}) {
+function AutocompleteInput({ label, value, setValue, placeholder }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const suggestions = useMemo(() => {
     if (!value.trim()) return cities.slice(0, 8);
 
-    return cities.filter((item) => {
-      const text = value.toLowerCase();
-      return (
-        item.city.toLowerCase().includes(text) ||
-        item.airport.toLowerCase().includes(text)
-      );
-    }).slice(0, 8);
+    return cities
+      .filter((item) => {
+        const text = value.toLowerCase();
+        return (
+          item.city.toLowerCase().includes(text) ||
+          item.airport.toLowerCase().includes(text)
+        );
+      })
+      .slice(0, 8);
   }, [value]);
 
   return (
@@ -159,12 +208,83 @@ function AutocompleteInput({
               }}
               style={suggestionButtonStyle}
             >
-              <div style={{ fontWeight: "bold", color: "#111" }}>{item.city}</div>
-              <div style={{ fontSize: "12px", color: "#667" }}>{item.airport}</div>
+              <div style={suggestionTitleStyle}>{item.city}</div>
+              <div style={suggestionSubtitleStyle}>{item.airport}</div>
             </button>
           ))}
         </div>
       ) : null}
+    </div>
+  );
+}
+
+function ResultCard({ r }) {
+  return (
+    <div style={cardStyle}>
+      <div style={cardHeaderStyle}>
+        <div>
+          <div
+            style={{
+              ...pillStyle,
+              backgroundColor: r.valueColor
+            }}
+          >
+            {r.valueLabel}
+          </div>
+          <h3 style={routeTitleStyle}>
+            {r.origin} → {r.destination}
+          </h3>
+          <p style={mutedStyle}>{r.date} · {r.cabin}</p>
+        </div>
+
+        <div style={brandBoxStyle}>
+          <div style={brandEmojiStyle}>{r.airlineEmoji}</div>
+          <div style={brandNameStyle}>{r.airlineName}</div>
+        </div>
+      </div>
+
+      <div style={statsGridStyle}>
+        <div style={statBoxStyle}>
+          <div style={smallLabelStyle}>Cash fare</div>
+          <div style={bigValueStyle}>${r.cashPrice}</div>
+        </div>
+
+        <div style={statBoxStyle}>
+          <div style={smallLabelStyle}>Award price</div>
+          <div style={bigValueStyle}>{r.miles.toLocaleString()}</div>
+          <div style={tinyTextStyle}>miles + ${r.taxes}</div>
+        </div>
+
+        <div style={statBoxStyle}>
+          <div style={smallLabelStyle}>CPP</div>
+          <div style={bigValueStyle}>{r.cpp.toFixed(1)}</div>
+        </div>
+
+        <div style={statBoxStyle}>
+          <div style={smallLabelStyle}>Program</div>
+          <div style={programValueStyle}>{r.program}</div>
+        </div>
+      </div>
+
+      <div style={buttonGroupStyle}>
+        <a
+          href={r.cashUrl}
+          target="_blank"
+          rel="noreferrer"
+          style={linkButtonPrimaryStyle}
+        >
+          Book with cash
+        </a>
+
+        <a
+          href={r.pointsUrl}
+          target="_blank"
+          rel="noreferrer"
+          style={linkButtonSecondaryStyle}
+        >
+          Book with points
+        </a>
+      </div>
     </div>
   );
 }
@@ -208,16 +328,20 @@ export default function Home() {
 
   return (
     <div style={pageStyle}>
+      <div style={backgroundGlowOne} />
+      <div style={backgroundGlowTwo} />
+
       <div style={containerStyle}>
         <div style={heroStyle}>
-          <h1 style={titleStyle}>Award Travel Finder ✈️</h1>
+          <div style={heroBadgeStyle}>Premium award search demo</div>
+          <h1 style={titleStyle}>Book smarter with points</h1>
           <p style={subtitleStyle}>
-            Type city names, choose a date, and compare cash vs award pricing.
+            Search by city, compare cash versus miles, and jump straight to the airline website.
           </p>
         </div>
 
         <div style={searchCardStyle}>
-          <h2 style={{ marginTop: 0 }}>Search flights</h2>
+          <h2 style={sectionTitleStyle}>Search flights</h2>
 
           <div style={gridStyle}>
             <AutocompleteInput
@@ -260,9 +384,9 @@ export default function Home() {
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: 10, marginTop: 18, flexWrap: "wrap" }}>
+          <div style={buttonRowStyle}>
             <button onClick={() => setSearched(true)} style={primaryButtonStyle}>
-              Find Awards
+              Find awards
             </button>
 
             <button
@@ -283,62 +407,34 @@ export default function Home() {
         {searched ? (
           shownResults.length === 0 ? (
             <div style={emptyStyle}>
-              <p style={{ marginTop: 0 }}>No sample routes found for that city pair yet.</p>
-              <p style={{ marginBottom: 0 }}>
+              <h3 style={{ marginTop: 0, marginBottom: 8 }}>No sample routes found</h3>
+              <p style={{ margin: 0, color: "#5f6b7a" }}>
                 Try Medellin → Madrid, Bogota → Madrid, Bogota → Paris, Mexico City → Madrid, Sao Paulo → Paris, Lima → Madrid, or Bogota → Miami.
               </p>
             </div>
           ) : (
             <>
-              <div style={{ marginBottom: 16 }}>
-                <h2 style={{ marginBottom: 6 }}>Results ({shownResults.length})</h2>
-                <p style={{ color: "#666", marginTop: 0 }}>
-                  Showing the selected date plus nearby dates.
-                </p>
+              <div style={resultsHeaderStyle}>
+                <div>
+                  <h2 style={sectionTitleStyle}>Results</h2>
+                  <p style={resultsSubtextStyle}>
+                    Showing the selected date plus nearby dates.
+                  </p>
+                </div>
+                <div style={resultsCountStyle}>{shownResults.length} options</div>
               </div>
 
               <div style={resultsGridStyle}>
                 {shownResults.map((r, i) => (
-                  <div key={i} style={cardStyle}>
-                    <div style={pillStyle}>{r.valueLabel}</div>
-
-                    <h3 style={{ marginTop: 0, marginBottom: 8 }}>{r.program}</h3>
-
-                    <p style={mutedStyle}>
-                      {r.origin} → {r.destination} · {r.date}
-                    </p>
-
-                    <div style={statsGridStyle}>
-                      <div style={statBoxStyle}>
-                        <div style={smallLabelStyle}>Cash</div>
-                        <div style={bigValueStyle}>${r.cashPrice}</div>
-                      </div>
-
-                      <div style={statBoxStyle}>
-                        <div style={smallLabelStyle}>Award</div>
-                        <div style={bigValueStyle}>{r.miles.toLocaleString()}</div>
-                        <div style={tinyTextStyle}>miles + ${r.taxes}</div>
-                      </div>
-
-                      <div style={statBoxStyle}>
-                        <div style={smallLabelStyle}>CPP</div>
-                        <div style={bigValueStyle}>{r.cpp.toFixed(1)}</div>
-                      </div>
-
-                      <div style={statBoxStyle}>
-                        <div style={smallLabelStyle}>Cabin</div>
-                        <div style={bigValueStyle}>{r.cabin}</div>
-                      </div>
-                    </div>
-                  </div>
+                  <ResultCard key={i} r={r} />
                 ))}
               </div>
             </>
           )
         ) : (
           <div style={emptyStyle}>
-            <p style={{ margin: 0 }}>
-              Start typing a city name and choose from the suggestions.
+            <p style={{ margin: 0, color: "#5f6b7a" }}>
+              Start typing a city name, choose a date, and click <strong>Find awards</strong>.
             </p>
           </div>
         )}
@@ -348,38 +444,93 @@ export default function Home() {
 }
 
 const pageStyle = {
-  fontFamily: "Arial, sans-serif",
-  backgroundColor: "#f4f7fb",
+  position: "relative",
+  overflow: "hidden",
+  fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  background: "linear-gradient(180deg, #f8fbff 0%, #eef4ff 100%)",
   minHeight: "100vh",
-  padding: "32px 18px"
+  padding: "40px 18px"
+};
+
+const backgroundGlowOne = {
+  position: "absolute",
+  top: "-120px",
+  right: "-80px",
+  width: "340px",
+  height: "340px",
+  borderRadius: "999px",
+  background: "rgba(96, 165, 250, 0.18)",
+  filter: "blur(60px)"
+};
+
+const backgroundGlowTwo = {
+  position: "absolute",
+  bottom: "-120px",
+  left: "-80px",
+  width: "320px",
+  height: "320px",
+  borderRadius: "999px",
+  background: "rgba(167, 139, 250, 0.16)",
+  filter: "blur(60px)"
 };
 
 const containerStyle = {
+  position: "relative",
+  zIndex: 1,
   maxWidth: "1140px",
   margin: "0 auto"
 };
 
 const heroStyle = {
-  marginBottom: "24px"
+  marginBottom: "28px"
+};
+
+const heroBadgeStyle = {
+  display: "inline-block",
+  padding: "8px 12px",
+  borderRadius: "999px",
+  background: "rgba(255,255,255,0.75)",
+  border: "1px solid rgba(148,163,184,0.2)",
+  color: "#31507a",
+  fontSize: "13px",
+  fontWeight: 600,
+  marginBottom: "14px",
+  backdropFilter: "blur(10px)"
 };
 
 const titleStyle = {
-  fontSize: "42px",
-  marginBottom: "8px"
+  fontSize: "52px",
+  lineHeight: 1.02,
+  letterSpacing: "-0.04em",
+  marginBottom: "12px",
+  color: "#0f172a",
+  maxWidth: "800px"
 };
 
 const subtitleStyle = {
-  color: "#556",
+  color: "#475569",
   fontSize: "18px",
-  marginTop: 0
+  lineHeight: 1.6,
+  marginTop: 0,
+  maxWidth: "760px"
 };
 
 const searchCardStyle = {
-  backgroundColor: "white",
-  borderRadius: "18px",
-  padding: "24px",
-  boxShadow: "0 10px 28px rgba(0,0,0,0.08)",
-  marginBottom: "26px"
+  background: "rgba(255,255,255,0.8)",
+  backdropFilter: "blur(16px)",
+  borderRadius: "28px",
+  padding: "26px",
+  border: "1px solid rgba(148,163,184,0.18)",
+  boxShadow: "0 20px 50px rgba(15, 23, 42, 0.08)",
+  marginBottom: "28px"
+};
+
+const sectionTitleStyle = {
+  marginTop: 0,
+  marginBottom: 16,
+  fontSize: "24px",
+  color: "#0f172a",
+  letterSpacing: "-0.02em"
 };
 
 const gridStyle = {
@@ -390,19 +541,23 @@ const gridStyle = {
 
 const labelStyle = {
   display: "block",
-  fontSize: "14px",
-  color: "#556",
+  fontSize: "13px",
+  fontWeight: 600,
+  color: "#475569",
   marginBottom: "8px"
 };
 
 const inputStyle = {
   width: "100%",
   boxSizing: "border-box",
-  padding: "12px 14px",
-  borderRadius: "12px",
-  border: "1px solid #d6dce5",
+  padding: "14px 16px",
+  borderRadius: "16px",
+  border: "1px solid #dbe4f0",
   fontSize: "15px",
-  backgroundColor: "white"
+  color: "#0f172a",
+  backgroundColor: "#ffffff",
+  outline: "none",
+  boxShadow: "inset 0 1px 2px rgba(15,23,42,0.03)"
 };
 
 const suggestionsBoxStyle = {
@@ -410,107 +565,228 @@ const suggestionsBoxStyle = {
   top: "100%",
   left: 0,
   right: 0,
-  backgroundColor: "white",
-  border: "1px solid #d6dce5",
-  borderRadius: "12px",
-  marginTop: "6px",
-  boxShadow: "0 10px 24px rgba(0,0,0,0.10)",
+  backgroundColor: "rgba(255,255,255,0.96)",
+  border: "1px solid #dbe4f0",
+  borderRadius: "16px",
+  marginTop: "8px",
+  boxShadow: "0 18px 40px rgba(15,23,42,0.12)",
   overflow: "hidden",
-  zIndex: 20
+  zIndex: 20,
+  backdropFilter: "blur(12px)"
 };
 
 const suggestionButtonStyle = {
   display: "block",
   width: "100%",
   textAlign: "left",
-  padding: "12px 14px",
+  padding: "13px 14px",
   border: "none",
   backgroundColor: "white",
   cursor: "pointer"
 };
 
+const suggestionTitleStyle = {
+  fontWeight: 700,
+  color: "#0f172a",
+  fontSize: "14px"
+};
+
+const suggestionSubtitleStyle = {
+  fontSize: "12px",
+  color: "#64748b",
+  marginTop: "2px"
+};
+
+const buttonRowStyle = {
+  display: "flex",
+  gap: 10,
+  marginTop: 20,
+  flexWrap: "wrap"
+};
+
 const primaryButtonStyle = {
-  padding: "12px 18px",
-  backgroundColor: "#111",
+  padding: "14px 20px",
+  background: "linear-gradient(135deg, #2563eb 0%, #4f46e5 100%)",
   color: "white",
   border: "none",
-  borderRadius: "12px",
+  borderRadius: "16px",
   cursor: "pointer",
-  fontSize: "15px"
+  fontSize: "15px",
+  fontWeight: 700,
+  boxShadow: "0 12px 24px rgba(79,70,229,0.22)"
 };
 
 const secondaryButtonStyle = {
-  padding: "12px 18px",
-  backgroundColor: "white",
+  padding: "14px 20px",
+  backgroundColor: "rgba(255,255,255,0.9)",
   color: "#111",
-  border: "1px solid #d6dce5",
-  borderRadius: "12px",
+  border: "1px solid #dbe4f0",
+  borderRadius: "16px",
   cursor: "pointer",
-  fontSize: "15px"
+  fontSize: "15px",
+  fontWeight: 600
 };
 
 const emptyStyle = {
-  backgroundColor: "white",
-  padding: "24px",
-  borderRadius: "18px",
-  boxShadow: "0 10px 28px rgba(0,0,0,0.08)"
+  background: "rgba(255,255,255,0.84)",
+  backdropFilter: "blur(14px)",
+  padding: "26px",
+  borderRadius: "24px",
+  border: "1px solid rgba(148,163,184,0.16)",
+  boxShadow: "0 18px 40px rgba(15,23,42,0.08)"
+};
+
+const resultsHeaderStyle = {
+  display: "flex",
+  alignItems: "end",
+  justifyContent: "space-between",
+  gap: "12px",
+  marginBottom: "18px",
+  flexWrap: "wrap"
+};
+
+const resultsSubtextStyle = {
+  marginTop: 0,
+  color: "#64748b"
+};
+
+const resultsCountStyle = {
+  padding: "10px 14px",
+  borderRadius: "999px",
+  background: "rgba(255,255,255,0.85)",
+  border: "1px solid rgba(148,163,184,0.18)",
+  color: "#334155",
+  fontWeight: 700
 };
 
 const resultsGridStyle = {
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+  gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))",
   gap: "18px"
 };
 
 const cardStyle = {
-  backgroundColor: "white",
-  borderRadius: "18px",
+  background: "rgba(255,255,255,0.9)",
+  backdropFilter: "blur(12px)",
+  borderRadius: "26px",
   padding: "22px",
-  boxShadow: "0 10px 28px rgba(0,0,0,0.08)"
+  border: "1px solid rgba(148,163,184,0.16)",
+  boxShadow: "0 18px 40px rgba(15,23,42,0.08)"
+};
+
+const cardHeaderStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  gap: "14px",
+  alignItems: "flex-start",
+  marginBottom: "16px"
 };
 
 const pillStyle = {
   display: "inline-block",
-  padding: "6px 12px",
-  backgroundColor: "#111",
+  padding: "7px 12px",
   color: "white",
   borderRadius: "999px",
   fontSize: "12px",
-  marginBottom: "14px"
+  fontWeight: 700,
+  marginBottom: "12px"
+};
+
+const routeTitleStyle = {
+  marginTop: 0,
+  marginBottom: 8,
+  fontSize: "24px",
+  color: "#0f172a",
+  letterSpacing: "-0.02em"
 };
 
 const mutedStyle = {
-  color: "#667",
+  color: "#64748b",
   marginTop: 0,
-  marginBottom: "14px"
+  marginBottom: "0"
+};
+
+const brandBoxStyle = {
+  minWidth: "92px",
+  textAlign: "right"
+};
+
+const brandEmojiStyle = {
+  fontSize: "24px",
+  marginBottom: "6px"
+};
+
+const brandNameStyle = {
+  fontSize: "13px",
+  color: "#475569",
+  fontWeight: 700
 };
 
 const statsGridStyle = {
   display: "grid",
   gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-  gap: "10px"
+  gap: "12px",
+  marginBottom: "18px"
 };
 
 const statBoxStyle = {
-  backgroundColor: "#f7f9fc",
-  borderRadius: "14px",
-  padding: "12px"
+  background: "linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)",
+  borderRadius: "18px",
+  padding: "14px",
+  border: "1px solid #e5edf7"
 };
 
 const smallLabelStyle = {
   fontSize: "12px",
-  color: "#667",
-  marginBottom: "4px"
+  color: "#64748b",
+  marginBottom: "5px",
+  fontWeight: 600
 };
 
 const bigValueStyle = {
   fontSize: "22px",
-  fontWeight: "bold",
-  color: "#111"
+  fontWeight: 800,
+  color: "#0f172a",
+  letterSpacing: "-0.02em"
 };
 
 const tinyTextStyle = {
   fontSize: "12px",
-  color: "#667",
-  marginTop: "2px"
+  color: "#64748b",
+  marginTop: "4px"
+};
+
+const programValueStyle = {
+  fontSize: "16px",
+  fontWeight: 700,
+  color: "#0f172a"
+};
+
+const buttonGroupStyle = {
+  display: "flex",
+  gap: "10px",
+  flexWrap: "wrap"
+};
+
+const linkButtonPrimaryStyle = {
+  display: "inline-block",
+  padding: "12px 16px",
+  borderRadius: "14px",
+  textDecoration: "none",
+  background: "linear-gradient(135deg, #2563eb 0%, #4f46e5 100%)",
+  color: "white",
+  fontWeight: 700,
+  fontSize: "14px"
+};
+
+const linkButtonSecondaryStyle = {
+  display: "inline-block",
+  padding: "12px 16px",
+  borderRadius: "14px",
+  textDecoration: "none",
+  background: "#ffffff",
+  color: "#0f172a",
+  border: "1px solid #dbe4f0",
+  fontWeight: 700,
+  fontSize: "14px"
 };
